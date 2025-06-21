@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app', ['pendampingRandom' => $pendampingRandom ?? null])
 
 @section('title', 'Dashboard') {{-- Ini untuk <title> --}}
 @section('page-title', 'Dashboard') {{-- Ini untuk judul halaman di body (opsional) --}}

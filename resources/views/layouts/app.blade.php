@@ -116,7 +116,20 @@
             </li>
 
             <!-- Nav Item - pendamping -->
-            <!-- Removed duplicate Pendamping menu item to avoid confusion -->
+            @if(auth()->user() && auth()->user()->role == 'penerima' && isset($pendampingRandom) && $pendampingRandom)
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('pendamping.list') }}">
+                    <i class="fas fa-fw fa-tasks"></i>
+                    <span>Info Pendamping</span><br>
+                </a>
+            </li>
+            @else
+            <li class="nav-item">
+                <a class="nav-link" href="tables.html">
+                    <i class="fas fa-fw fa-tasks"></i>
+                    <span>Info Pendamping</span></a>
+            </li>
+            @endif
 
             <!-- Divider -->
             <hr class="sidebar-divider">

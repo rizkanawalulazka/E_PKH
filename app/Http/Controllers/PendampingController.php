@@ -53,4 +53,14 @@ class PendampingController extends Controller
             'menuLaporan' => 'active'
         ]);
     }
+
+    public function list()
+    {
+        $pendampings = \App\Models\Pendamping::with('user')->get();
+        return view('pendamping.list', [
+            'pendampings' => $pendampings,
+            'title' => 'Daftar Pendamping',
+            'menuPendampingList' => 'active',
+        ]);
+    }
 }
