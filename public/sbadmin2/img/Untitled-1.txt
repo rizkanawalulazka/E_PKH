@@ -1,0 +1,2 @@
+<?php
+<img src="{{ asset('img/undraw_profile_2.svg') }}" ...>
