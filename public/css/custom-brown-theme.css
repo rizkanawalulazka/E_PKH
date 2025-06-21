@@ -1,0 +1,295 @@
+/* Custom Brown Theme for E-PKH */
+:root {
+    --brown-primary: #0A1128;
+    --brown-dark: #1B263B;
+    --brown-light: #F2F4F8;
+    --brown-hover: #2E8BC0;
+    --brown-100: #E0F2F7;
+    --brown-200: #B3E0EE;
+    --brown-300: #85CCDC;
+    --brown-400: #57B8CC;
+    --brown-500: #0A1128;
+    --brown-600: #2E8BC0;
+    --brown-700: #1B263B;
+    --brown-800: #054A6F;
+    --brown-900: #032F4D;
+}
+
+/* Sidebar */
+.sidebar {
+    background: linear-gradient(135deg, var(--brown-primary) 0%, var(--brown-dark) 100%) !important;
+}
+
+.sidebar-dark .nav-item .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.sidebar-dark .nav-item .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.sidebar-dark .sidebar-heading {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--brown-primary) !important;
+    border-color: var(--brown-primary) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--brown-dark) !important;
+    border-color: var(--brown-dark) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(10,17,40,0.2);
+}
+
+/* Cards */
+.card {
+    border-left: 0.25rem solid var(--brown-primary) !important;
+}
+
+.card-header {
+    background-color: var(--brown-light) !important;
+    border-bottom: 1px solid rgba(10, 17, 40, 0.125) !important;
+}
+
+/* Dashboard Cards */
+.border-left-primary {
+    border-left-color: var(--brown-primary) !important;
+}
+
+.border-left-success {
+    border-left-color: var(--brown-400) !important;
+}
+
+.border-left-info {
+    border-left-color: var(--brown-300) !important;
+}
+
+.border-left-warning {
+    border-left-color: var(--brown-500) !important;
+}
+
+/* Progress Bars */
+.progress-bar {
+    background-color: var(--brown-primary) !important;
+}
+
+/* Tables */
+.table thead th {
+    border-bottom-color: var(--brown-primary) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--brown-100) !important;
+}
+
+/* Dropdowns */
+.dropdown-item.active, 
+.dropdown-item:active {
+    background-color: var(--brown-primary) !important;
+}
+
+.dropdown-header {
+    background-color: var(--brown-primary) !important;
+    border-bottom: 1px solid var(--brown-dark) !important;
+    color: white !important;
+}
+
+/* Forms */
+.form-control:focus {
+    border-color: var(--brown-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(10, 17, 40, 0.25) !important;
+}
+
+/* Badges */
+.badge-primary {
+    background-color: var(--brown-primary) !important;
+}
+
+.badge-success {
+    background-color: var(--brown-400) !important;
+}
+
+.badge-info {
+    background-color: var(--brown-300) !important;
+}
+
+.badge-warning {
+    background-color: var(--brown-500) !important;
+}
+
+/* Charts */
+.chart-area canvas,
+.chart-pie canvas,
+.chart-bar canvas {
+    filter: hue-rotate(0deg) saturate(1.2) !important;
+}
+
+/* Chart colors override */
+:root {
+    --chart-color-1: var(--brown-primary);
+    --chart-color-2: var(--brown-dark);
+    --chart-color-3: var(--brown-600);
+    --chart-color-4: var(--brown-400);
+    --chart-color-5: var(--brown-300);
+    --chart-color-6: var(--brown-200);
+}
+
+/* Custom background utilities */
+.bg-brown-gradient {
+    background: linear-gradient(135deg, var(--brown-primary) 0%, var(--brown-dark) 100%) !important;
+}
+
+.bg-brown-light {
+    background-color: var(--brown-light) !important;
+}
+
+/* Links */
+a {
+    color: var(--brown-dark);
+}
+
+a:hover {
+    color: var(--brown-primary);
+    text-decoration: none;
+}
+
+/* Topbar */
+.topbar {
+    background-color: var(--brown-light) !important;
+}
+
+.topbar .dropdown-list .dropdown-header {
+    background-color: var(--brown-primary) !important;
+    border-color: var(--brown-dark) !important;
+}
+
+/* Shadows */
+.shadow-brown {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(10, 17, 40, 0.15) !important;
+}
+
+/* Pagination */
+.page-item.active .page-link {
+    background-color: var(--brown-primary) !important;
+    border-color: var(--brown-primary) !important;
+}
+
+.page-link {
+    color: var(--brown-primary) !important;
+}
+
+.page-link:hover {
+    color: var(--brown-dark) !important;
+}
+
+/* Background utilities */
+.bg-primary {
+    background-color: var(--brown-primary) !important;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--brown-primary) 0%, var(--brown-dark) 100%) !important;
+}
+
+/* Text utilities */
+.text-primary {
+    color: var(--brown-dark) !important;
+}
+
+.text-success {
+    color: var(--brown-dark) !important;
+}
+
+.text-info {
+    color: var(--brown-dark) !important;
+}
+
+.text-warning {
+    color: var(--brown-dark) !important;
+}
+
+.text-danger {
+    color: #e74a3b !important;
+}
+
+.text-secondary {
+    color: #858796 !important;
+}
+
+.text-light {
+    color: #f8f9fc !important;
+}
+
+.text-dark {
+    color: #5a5c69 !important;
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Borders */
+.border-left-primary {
+    border-left-color: var(--brown-primary) !important;
+}
+
+/* Custom background classes */
+.bg-brown-light {
+    background-color: var(--brown-light) !important;
+}
+
+/* Dropdown menus */
+.dropdown-item.active, 
+.dropdown-item:active {
+    background-color: var(--brown-primary);
+}
+
+/* Tables */
+.table thead th {
+    border-bottom-color: var(--brown-primary);
+}
+
+/* Pagination */
+.page-item.active .page-link {
+    background-color: var(--brown-primary);
+    border-color: var(--brown-primary);
+}
+
+.page-link {
+    color: var(--brown-primary);
+}
+
+.page-link:hover {
+    color: var(--brown-dark);
+}
+
+/* Charts colors */
+.chart-brown-primary {
+    background-color: var(--brown-primary) !important;
+}
+
+.chart-brown-dark {
+    background-color: var(--brown-dark) !important;
+}
+
+/* Add custom styles for charts */
+.chart-pie canvas,
+.chart-bar canvas {
+    filter: hue-rotate(0deg) saturate(1.2);
+}
+
+.card-shadow {
+    box-shadow: 0 4px 12px rgba(10,17,40,0.2);
+} 
