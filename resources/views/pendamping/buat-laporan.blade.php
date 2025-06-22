@@ -20,7 +20,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">Form Laporan Pendampingan</h6>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('pendamping.laporan.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('pendamping.laporan.simpan') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label for="tanggal">Tanggal</label>
@@ -28,7 +28,8 @@
                         </div>
                         <div class="form-group">
                             <label for="penerima">Penerima</label>
-                            <input type="text" name="penerima" class="form-control" required>
+                            <input type="text" name="penerima_nama" class="form-control" value="{{ $penerima->name }}" readonly>
+                            <input type="hidden" name="penerima_id" value="{{ $penerima->id }}">
                         </div>
                         <div class="form-group">
                             <label for="kegiatan">Kegiatan</label>

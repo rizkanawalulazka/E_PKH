@@ -11,7 +11,9 @@
             Daftar Laporan Pendampingan
         </h1>
     </div>
-    <div class="alert alert-warning">Fitur laporan pendampingan tidak tersedia karena tabel tidak ada.</div>
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
     <!-- Content Row -->
     <div class="row">
         <div class="col-xl-12 col-lg-12">
@@ -28,12 +30,57 @@
                                 <th>Kegiatan</th>
                                 <th>Status</th>
                                 <th>Foto</th>
+                                <th>Verifikasi</th>
+                                @if(auth()->user()->role === 'admin')
+                                    <th>Aksi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse($laporan as $lap)
                             <tr>
-                                <td colspan="5" class="text-center">Fitur laporan pendampingan tidak tersedia.</td>
+                                <td>{{ $lap->tanggal }}</td>
+                                <td>{{ $lap->penerima->name ?? '-' }}</td>
+                                <td>{{ $lap->kegiatan }}</td>
+                                <td><span class="badge badge-{{ $lap->status == 'Selesai' ? 'success' : 'warning' }}">{{ $lap->status }}</span></td>
+                                <td>
+                                    @if($lap->foto)
+                                        <img src="{{ asset('storage/'.$lap->foto) }}" alt="foto" width="40">
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($lap->verifikasi_status == 'pending')
+                                        <span class="badge badge-warning">Pending</span>
+                                    @elseif($lap->verifikasi_status == 'approved')
+                                        <span class="badge badge-success">Disetujui</span>
+                                    @else
+                                        <span class="badge badge-danger">Ditolak</span>
+                                    @endif
+                                </td>
+                                @if(auth()->user()->role === 'admin')
+                                <td>
+                                    @if($lap->verifikasi_status == 'pending')
+                                    <form action="{{ route('pendamping.laporan.approve', $lap->id) }}" method="POST" style="display:inline-block;">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Setujui laporan ini?')">Setujui</button>
+                                    </form>
+                                    <form action="{{ route('pendamping.laporan.reject', $lap->id) }}" method="POST" style="display:inline-block;">
+                                        @csrf
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tolak laporan ini?')">Tolak</button>
+                                    </form>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                @endif
                             </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center">Belum ada laporan pendampingan.</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
