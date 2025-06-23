@@ -49,7 +49,7 @@
                             </td>
                             <td>
                                 @if($data->status == 'pending')
-                                    <span class="badge badge-warning">Pending</span>
+                                    <span class="badge badge-warning">Diproses</span>
                                 @elseif($data->status == 'approved')
                                     <span class="badge badge-success">Disetujui</span>
                                 @else

@@ -7,6 +7,7 @@ use App\Models\Pendamping;
 use Illuminate\Http\Request;
 use App\Models\LaporanPendampingan;
 use Illuminate\Support\Facades\Auth;
+use App\Models\PendaftaranPKH;
 
 class PendampingController extends Controller
 {
@@ -21,7 +22,7 @@ class PendampingController extends Controller
             $pendamping = $pendaftaran->pendamping ?? \App\Models\User::where('role', 'pendamping')->inRandomOrder()->first();
         }
 
-        return view('nama_view', compact('pendaftaran', 'pendamping'));
+            return view('pendamping.info-pendamping', compact('pendaftaran', 'pendamping'));
     }
 
     public function daftarPenerima()
