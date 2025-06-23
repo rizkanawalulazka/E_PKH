@@ -39,29 +39,31 @@
                         <tbody>
                             @forelse($laporan as $lap)
                             <tr>
-                                <td>{{ $lap->tanggal }}</td>
-                                <td>{{ $lap->penerima->name ?? '-' }}</td>
-                                <td>{{ $lap->kegiatan }}</td>
-                                <td><span class="badge badge-{{ $lap->status == 'Selesai' ? 'success' : 'warning' }}">{{ $lap->status }}</span></td>
+                                <td>{{ $lap->tanggal ?? '-' }}</td>
+                                <td>{{ optional($lap->penerima)->name ?? '-' }}</td>
+                                <td>{{ $lap->kegiatan ?? '-' }}</td>
+                                <td><span class="badge badge-{{ ($lap->status ?? '') == 'Selesai' ? 'success' : 'warning' }}">{{ $lap->status ?? '-' }}</span></td>
                                 <td>
-                                    @if($lap->foto)
+                                    @if(isset($lap->foto) && $lap->foto)
                                         <img src="{{ asset('storage/'.$lap->foto) }}" alt="foto" width="40">
                                     @else
                                         -
                                     @endif
                                 </td>
                                 <td>
-                                    @if($lap->verifikasi_status == 'pending')
+                                    @if(isset($lap->verifikasi_status) && $lap->verifikasi_status == 'pending')
                                         <span class="badge badge-warning">Pending</span>
-                                    @elseif($lap->verifikasi_status == 'approved')
+                                    @elseif(isset($lap->verifikasi_status) && $lap->verifikasi_status == 'approved')
                                         <span class="badge badge-success">Disetujui</span>
-                                    @else
+                                    @elseif(isset($lap->verifikasi_status) && $lap->verifikasi_status == 'rejected')
                                         <span class="badge badge-danger">Ditolak</span>
+                                    @else
+                                        <span class="badge badge-secondary">-</span>
                                     @endif
                                 </td>
                                 @if(auth()->user()->role === 'admin')
                                 <td>
-                                    @if($lap->verifikasi_status == 'pending')
+                                    @if(isset($lap->verifikasi_status) && $lap->verifikasi_status == 'pending')
                                     <form action="{{ route('pendamping.laporan.approve', $lap->id) }}" method="POST" style="display:inline-block;">
                                         @csrf
                                         <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Setujui laporan ini?')">Setujui</button>
@@ -88,4 +90,4 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection

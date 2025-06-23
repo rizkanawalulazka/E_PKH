@@ -13,6 +13,7 @@
     </div>
 
     <!-- Form Buat Laporan -->
+    @if(isset($penerima) && $penerima)
     <div class="row mb-4">
         <div class="col-xl-8 col-lg-8">
             <div class="card shadow">
@@ -52,6 +53,9 @@
             </div>
         </div>
     </div>
+    @else
+    <div class="alert alert-danger">Data penerima tidak ditemukan atau tidak valid. Silakan kembali dan pilih penerima yang benar.</div>
+    @endif
 
     <!-- Tabel Laporan -->
     <div class="row">

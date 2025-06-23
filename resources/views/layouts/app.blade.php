@@ -125,19 +125,15 @@
             </li>
             @else
             <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-tasks"></i>
-                    <span>Info Pendamping</span></a>
+                <a class="nav-link" href="{{ route('pendamping.info') }}">
+                 <i class="fas fa-user-friends"></i>
+                <span>Info Pendamping</span>
+              </a>
             </li>
-            @endif
+            @endif  
 
             <!-- Divider -->
             <hr class="sidebar-divider">
-            
-                        <!-- Heading -->
-            <div class="sidebar-heading">
-                Menu User
-            </div>
 
             @auth
                 @if(auth()->user()->role == 'penerima')
@@ -150,34 +146,8 @@
                 @endif
             @endauth
 
-            <!-- Nav Item - daftar pkh -->
-            <li class="nav-item">
-                <a class="nav-link" href="charts.html">
-                    <i class="fas fa-fw fa-user-plus"></i>
-                    <span>Daftar PKH </span></a>
-            </li>
-
-            <!-- Nav Item - pendamping -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-tasks"></i>
-                    <span>Info Pendamping</span></a>
-            </li>
-
             <!-- Divider -->
             <hr class="sidebar-divider">
-
-                        <!-- Heading -->
-            <div class="sidebar-heading">
-                Menu Pendamping
-            </div>
-
-            <!-- Nav Item - pendamping -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-user"></i>
-                    <span>Pendamping</span></a>
-            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">

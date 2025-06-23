@@ -31,7 +31,7 @@
                         @forelse($pendampings as $i => $p)
                         <tr>
                             <td>{{ $i+1 }}</td>
-                            <td>{{ $p->user->nik ?? '-' }}</td>
+                            <td>{{ $p->user ? $p->user->nik : '-' }}</td>
                             <td>{{ $p->nama_lengkap }}</td>
                             <td>{{ $p->no_hp }}</td>
                             <td>{{ $p->alamat }}</td>

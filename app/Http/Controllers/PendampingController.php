@@ -12,15 +12,16 @@ class PendampingController extends Controller
 {
     public function index()
     {
-        $pendamping = Pendamping::first();
-        $penerima = User::where('role', 'penerima')->get();
-        
-        return view('pendamping.index', [
-            'pendamping' => $pendamping,
-            'penerima' => $penerima,
-            'title' => 'Dashboard Pendamping',
-            'menuPendamping' => 'active'
-        ]);
+        $user = Auth::user();
+        $pendaftaran = \App\Models\PendaftaranPKH::where('user_id', $user->id)->latest()->first();
+        $pendamping = null;
+
+        if ($pendaftaran && $pendaftaran->status === 'disetujui') {
+            // Ambil pendamping yang sudah di-assign ke pendaftaran, atau random jika belum ada
+            $pendamping = $pendaftaran->pendamping ?? \App\Models\User::where('role', 'pendamping')->inRandomOrder()->first();
+        }
+
+        return view('nama_view', compact('pendaftaran', 'pendamping'));
     }
 
     public function daftarPenerima()
@@ -121,5 +122,19 @@ class PendampingController extends Controller
         $laporan->catatan_admin = 'Ditolak admin';
         $laporan->save();
         return redirect()->back()->with('success', 'Laporan berhasil ditolak.');
+    }
+
+    public function infoPendamping()
+    {
+        $user = auth()->user();
+        $pendaftaran = \App\Models\PendaftaranPKH::where('user_id', $user->id)->latest()->first();
+        $pendamping = null;
+
+        if ($pendaftaran && $pendaftaran->status === 'disetujui') {
+            // Ambil pendamping yang sudah di-assign, atau random jika belum ada
+            $pendamping = $pendaftaran->pendamping ?? \App\Models\User::where('role', 'pendamping')->inRandomOrder()->first();
+        }
+
+        return view('pendamping.info-pendamping', compact('pendaftaran', 'pendamping'));
     }
 }
