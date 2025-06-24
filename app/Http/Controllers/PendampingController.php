@@ -37,7 +37,22 @@ class PendampingController extends Controller
 
     public function daftarPenerima()
     {
+        $user = Auth::user();
         $penerima = User::where('role', 'penerima')->get();
+
+        // Jika user adalah pendamping, tambahkan status pendampingan
+        if ($user->role === 'pendamping') {
+            $pendampingProfile = $user->pendamping;
+            foreach ($penerima as $p) {
+                // Ambil laporan terbaru untuk penerima ini dari pendamping yang sedang login
+                $latestReport = LaporanPendampingan::where('pendamping_id', $pendampingProfile->id)
+                                                      ->where('penerima_id', $p->id)
+                                                      ->latest('tanggal') // Urutkan berdasarkan tanggal terbaru
+                                                      ->first();
+                
+                $p->report_status = $latestReport ? $latestReport->status : null;
+            }
+        }
         
         return view('pendamping.index', [
             'penerima' => $penerima,
@@ -83,6 +98,37 @@ class PendampingController extends Controller
         ]);
 
         return redirect()->route('pendamping.laporan')->with('success', 'Laporan berhasil dikirim dan menunggu verifikasi admin.');
+    }
+
+    public function updatePenerimaReportStatus(Request $request, $penerima_id)
+    {
+        $request->validate([
+            'status' => 'required|in:Selesai,Proses',
+        ]);
+
+        $user = Auth::user();
+        if ($user->role !== 'pendamping') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
+        }
+
+        $pendampingProfile = $user->pendamping;
+        if (!$pendampingProfile) {
+            return response()->json(['success' => false, 'message' => 'Profil pendamping tidak ditemukan.'], 404);
+        }
+
+        $latestReport = LaporanPendampingan::where('pendamping_id', $pendampingProfile->id)
+                                            ->where('penerima_id', $penerima_id)
+                                            ->latest('tanggal')
+                                            ->first();
+
+        if (!$latestReport) {
+            return response()->json(['success' => false, 'message' => 'Belum ada laporan untuk penerima ini.'], 404);
+        }
+
+        $latestReport->status = $request->status;
+        $latestReport->save();
+
+        return response()->json(['success' => true, 'message' => 'Status laporan berhasil diperbarui.', 'new_status' => $request->status]);
     }
 
     public function daftarLaporan()

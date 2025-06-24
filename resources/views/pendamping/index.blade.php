@@ -73,6 +73,7 @@
                                 <tr>
                                     <th>NIK</th>
                                     <th>Nama</th>
+                                    <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -82,15 +83,38 @@
                                     <td>{{ $p->nik }}</td>
                                     <td>{{ $p->name }}</td>
                                     <td>
-                                        <a href="{{ route('pendamping.laporan') }}" 
+                                        @php
+                                            $statusClass = '';
+                                            $statusText = 'Belum Didampingi';
+                                            if ($p->report_status) {
+                                                $statusText = $p->report_status;
+                                                $statusClass = (
+                                                    $p->report_status === 'Selesai' ? 'badge-success' :
+                                                    ($p->report_status === 'Proses' ? 'badge-warning' : 'badge-secondary')
+                                                );
+                                            } else {
+                                                $statusClass = 'badge-secondary';
+                                            }
+                                        @endphp
+                                        @if($p->report_status)
+                                            <select class="form-control form-control-sm update-status-select" data-penerima-id="{{ $p->id }}">
+                                                <option value="Proses" {{ $p->report_status === 'Proses' ? 'selected' : '' }}>Proses</option>
+                                                <option value="Selesai" {{ $p->report_status === 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                                            </select>
+                                        @else
+                                            <span class="badge {{ $statusClass }} status-display-{{ $p->id }}">{{ $statusText }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('pendamping.laporan.buat', $p->id) }}" 
                                            class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye fa-sm"></i> Lihat Laporan
+                                            <i class="fas fa-plus fa-sm"></i> Buat Laporan
                                         </a>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="3" class="text-center">Tidak ada data penerima</td>
+                                    <td colspan="4" class="text-center">Tidak ada data penerima</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -101,4 +125,51 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+$(document).ready(function() {
+    $('.update-status-select').on('change', function() {
+        var penerimaId = $(this).data('penerima-id');
+        var newStatus = $(this).val();
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+        var statusSpan = $('.status-display-' + penerimaId);
+
+        $.ajax({
+            url: '/pendamping/penerima/' + penerimaId + '/update-status',
+            method: 'POST',
+            data: {
+                _token: csrfToken,
+                status: newStatus
+            },
+            success: function(response) {
+                if (response.success) {
+                    statusSpan.text(response.new_status);
+                    statusSpan.removeClass('badge-success badge-warning badge-secondary');
+                    if (response.new_status === 'Selesai') {
+                        statusSpan.addClass('badge-success');
+                    } else if (response.new_status === 'Proses') {
+                        statusSpan.addClass('badge-warning');
+                    } else {
+                        statusSpan.addClass('badge-secondary');
+                    }
+                    alert(response.message);
+                } else {
+                    alert('Gagal memperbarui status: ' + response.message);
+                }
+            },
+            error: function(xhr) {
+                var errorMessage = 'Terjadi kesalahan.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    errorMessage = xhr.responseText;
+                }
+                alert('Error: ' + errorMessage);
+            }
+        });
+    });
+});
+</script>
 @endsection 

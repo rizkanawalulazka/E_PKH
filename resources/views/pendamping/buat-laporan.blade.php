@@ -57,8 +57,9 @@
     <div class="alert alert-danger">Data penerima tidak ditemukan atau tidak valid. Silakan kembali dan pilih penerima yang benar.</div>
     @endif
 
-    <!-- Tabel Laporan -->
-    <div class="row">
+    {{-- Tabel Laporan --}}
+    {{-- Bagian ini dipindahkan ke daftar-laporan.blade.php --}}
+    {{-- <div class="row">
         <div class="col-xl-12 col-lg-12">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Laporan Pendampingan</h6>
@@ -77,7 +78,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- Contoh data statis, ganti dengan @foreach jika sudah ada data --}}
                             <tr>
                                 <td>2025-06-21</td>
                                 <td>Nama Penerima</td>
@@ -102,15 +102,11 @@
                                     <a href="#" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Buat Laporan</a>
                                 </td>
                             </tr>
-                            {{-- Jika tidak ada data --}}
-                            {{-- <tr>
-                                <td colspan="6" class="text-center">Belum ada laporan pendampingan.</td>
-                            </tr> --}}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 @endsection

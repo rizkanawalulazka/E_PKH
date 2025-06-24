@@ -38,3 +38,6 @@ Route::post('/pendamping/laporan', [PendampingController::class, 'simpanLaporan'
 Route::post('/pendamping/laporan/{id}/approve', [PendampingController::class, 'approveLaporan'])->name('pendamping.laporan.approve')->middleware('auth');
 Route::post('/pendamping/laporan/{id}/reject', [PendampingController::class, 'rejectLaporan'])->name('pendamping.laporan.reject')->middleware('auth');
 Route::get('/pendamping/info', [PendampingController::class, 'infoPendamping'])->name('pendamping.info');
+
+// Route untuk update status laporan penerima oleh pendamping
+Route::post('/pendamping/penerima/{penerima_id}/update-status', [PendampingController::class, 'updatePenerimaReportStatus'])->name('pendamping.penerima.update_status')->middleware('auth');
