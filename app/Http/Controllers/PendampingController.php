@@ -128,12 +128,13 @@ class PendampingController extends Controller
     public function infoPendamping()
     {
         $user = auth()->user();
-        $pendaftaran = \App\Models\PendaftaranPKH::where('user_id', $user->id)->latest()->first();
+        // Cek status pendaftaran (bisa dari pendaftaran atau pendaftaran_pkh, sesuaikan kebutuhan)
+        $pendaftaran = \App\Models\Pendaftaran::where('nik', $user->nik)->where('status', 'approved')->latest()->first();
         $pendamping = null;
 
-        if ($pendaftaran && $pendaftaran->status === 'disetujui') {
-            // Ambil pendamping yang sudah di-assign, atau random jika belum ada
-            $pendamping = $pendaftaran->pendamping ?? \App\Models\User::where('role', 'pendamping')->inRandomOrder()->first();
+        if ($user->role === 'penerima' && $pendaftaran) {
+            // Ambil satu pendamping acak dari user seeder (role pendamping)
+            $pendamping = \App\Models\Pendamping::with('user')->inRandomOrder()->first();
         }
 
         return view('pendamping.info-pendamping', compact('pendaftaran', 'pendamping'));
