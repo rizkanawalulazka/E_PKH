@@ -86,6 +86,13 @@
                         <i class="fas fa-fw fa-clipboard-list"></i>
                         <span>Laporan Pendampingan</span></a>
                 </li>
+
+                <!-- Nav Item - Daftar Penerima -->
+                <li class="nav-item {{ $menuPenerima ?? '' }}">
+                    <a class="nav-link" href="{{ route('pendamping.penerima') }}">
+                        <i class="fas fa-fw fa-users"></i>
+                        <span>Daftar Penerima</span></a>
+                </li>
                 @endif
             @endauth
 

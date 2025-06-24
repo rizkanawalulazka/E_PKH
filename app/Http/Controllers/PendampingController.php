@@ -37,11 +37,9 @@ class PendampingController extends Controller
 
     public function daftarPenerima()
     {
-        $pendamping = Pendamping::first();
         $penerima = User::where('role', 'penerima')->get();
         
-        return view('pendamping.daftar-penerima', [
-            'pendamping' => $pendamping,
+        return view('pendamping.index', [
             'penerima' => $penerima,
             'title' => 'Daftar Penerima Bantuan',
             'menuPenerima' => 'active'

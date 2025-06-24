@@ -82,9 +82,9 @@
                                     <td>{{ $p->nik }}</td>
                                     <td>{{ $p->name }}</td>
                                     <td>
-                                        <a href="{{ route('pendamping.laporan.buat', $p->id) }}" 
+                                        <a href="{{ route('pendamping.laporan') }}" 
                                            class="btn btn-primary btn-sm">
-                                            <i class="fas fa-plus fa-sm"></i> Buat Laporan
+                                            <i class="fas fa-eye fa-sm"></i> Lihat Laporan
                                         </a>
                                     </td>
                                 </tr>
