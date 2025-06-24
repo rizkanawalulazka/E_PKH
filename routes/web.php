@@ -38,6 +38,3 @@ Route::post('/pendamping/laporan', [PendampingController::class, 'simpanLaporan'
 Route::post('/pendamping/laporan/{id}/approve', [PendampingController::class, 'approveLaporan'])->name('pendamping.laporan.approve')->middleware('auth');
 Route::post('/pendamping/laporan/{id}/reject', [PendampingController::class, 'rejectLaporan'])->name('pendamping.laporan.reject')->middleware('auth');
 Route::get('/pendamping/info', [PendampingController::class, 'infoPendamping'])->name('pendamping.info');
-
-// Route daftar pendamping untuk semua user
-Route::get('/pendamping-list', [App\Http\Controllers\PendampingController::class, 'list'])->name('pendamping.list');

@@ -9,9 +9,11 @@
             <i class="fas fa-tachometer-alt mr-2"></i>
             @yield('page-title')
         </h1>
+        @if(auth()->user()->role !== 'pendamping')
         <a href="{{ route('pendaftaran.pkh.create') }}" class="d-none d-sm-inline-block btn btn-primary shadow-sm">
             <i class="fas fa-plus fa-sm text-white-50"></i> Daftar PKH Baru
         </a>
+        @endif
     </div>
 
     <!-- Content Row -->

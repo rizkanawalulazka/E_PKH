@@ -73,11 +73,11 @@
 
             @auth
                 @if(auth()->user()->role == 'pendamping' || auth()->user()->role == 'admin')
-                <!-- Nav Item - Pendamping -->
+                <!-- Nav Item - Daftar Pendamping -->
                 <li class="nav-item {{ $menuPendamping ?? '' }}">
                     <a class="nav-link" href="{{ route('pendamping.index') }}">
                         <i class="fas fa-fw fa-user-friends"></i>
-                        <span>Pendamping</span></a>
+                        <span>Daftar Pendamping</span></a>
                 </li>
 
                 <!-- Nav Item - Laporan -->
@@ -88,14 +88,6 @@
                 </li>
                 @endif
             @endauth
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Menu Admin
-            </div>
 
             @auth
                 @if(auth()->user()->role == 'admin')
@@ -108,12 +100,35 @@
                 @endif
             @endauth
 
-            <!-- Nav Item - daftar pkh -->
-            <li class="nav-item">
-                <a class="nav-link" href="charts.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Info Pendaftaran </span></a>
-            </li>
+            <!-- Nav Item - Daftar PKH untuk penerima -->
+            @auth
+                @if(auth()->user()->role == 'penerima')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('pendaftaran.pkh.create') }}">
+                        <i class="fas fa-fw fa-table"></i>
+                        <span>Daftar PKH</span></a>
+                </li>
+                @endif
+            @endauth
+
+            @auth
+                @if(auth()->user()->role == 'penerima')
+                <!-- Nav Item - Data Pendaftaran Saya -->
+                <li class="nav-item {{ $menuPendaftaran ?? '' }}">
+                    <a class="nav-link" href="{{ route('pendaftaran.pkh.index') }}">
+                        <i class="fas fa-fw fa-file-alt"></i>
+                        <span>Data Pendaftaran Saya</span></a>
+                </li>
+
+                <!-- Nav Item - Info Pendamping untuk Penerima -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('pendamping.info') }}">
+                        <i class="fas fa-user-friends"></i>
+                        <span>Info Pendamping</span>
+                    </a>
+                </li>
+                @endif
+            @endauth
 
             <!-- Nav Item - pendamping -->
             @if(auth()->user() && auth()->user()->role == 'penerima' && isset($pendampingRandom) && $pendampingRandom)
@@ -123,34 +138,8 @@
                     <span>Info Pendamping</span><br>
                 </a>
             </li>
-            @else
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('pendamping.info') }}">
-                 <i class="fas fa-user-friends"></i>
-                <span>Info Pendamping</span>
-              </a>
-            </li>
             @endif  
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            @auth
-                @if(auth()->user()->role == 'penerima')
-                <!-- Nav Item - Lihat Data Pendaftaran PKH -->
-                <li class="nav-item {{ $menuPendaftaran ?? '' }}">
-                    <a class="nav-link" href="{{ route('pendaftaran.pkh.index') }}">
-                        <i class="fas fa-fw fa-file-alt"></i>
-                        <span>Data Pendaftaran Saya</span></a>
-                </li>
-                @endif
-            @endauth
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
 
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">

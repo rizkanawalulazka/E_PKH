@@ -14,15 +14,25 @@ class PendampingController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $pendaftaran = \App\Models\PendaftaranPKH::where('user_id', $user->id)->latest()->first();
-        $pendamping = null;
 
-        if ($pendaftaran && $pendaftaran->status === 'disetujui') {
-            // Ambil pendamping yang sudah di-assign ke pendaftaran, atau random jika belum ada
-            $pendamping = $pendaftaran->pendamping ?? \App\Models\User::where('role', 'pendamping')->inRandomOrder()->first();
+        // Jika user adalah pendamping atau admin, tampilkan daftar pendamping
+        if ($user->role === 'pendamping' || $user->role === 'admin') {
+            $pendampings = \App\Models\Pendamping::with('user')->get();
+            return view('pendamping.list', [
+                'pendampings' => $pendampings,
+                'title' => 'Daftar Pendamping',
+                'menuPendampingList' => 'active',
+            ]);
         }
 
-            return view('pendamping.info-pendamping', compact('pendaftaran', 'pendamping'));
+        // Jika user adalah penerima, tampilkan info pendamping acak
+        $pendaftaran = \App\Models\Pendaftaran::where('nik', $user->nik)->where('status', 'approved')->latest()->first();
+        $pendamping = null;
+
+        if ($user->role === 'penerima' && $pendaftaran) {
+            $pendamping = \App\Models\Pendamping::with('user')->inRandomOrder()->first();
+        }
+        return view('pendamping.info-pendamping', compact('pendaftaran', 'pendamping'));
     }
 
     public function daftarPenerima()
@@ -94,16 +104,6 @@ class PendampingController extends Controller
             'laporan' => $laporan,
             'title' => 'Daftar Laporan Pendampingan',
             'menuLaporan' => 'active',
-        ]);
-    }
-
-    public function list()
-    {
-        $pendampings = \App\Models\Pendamping::with('user')->get();
-        return view('pendamping.list', [
-            'pendampings' => $pendampings,
-            'title' => 'Daftar Pendamping',
-            'menuPendampingList' => 'active',
         ]);
     }
 
