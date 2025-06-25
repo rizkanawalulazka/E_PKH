@@ -1,232 +1,185 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | E-PKH</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            min-height: 100vh;
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background: url('https://images.unsplash.com/photo-1519681393784-a4ee110ba2d6?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat; /* Placeholder wallpaper */
-            background-size: cover; /* Ensure the image covers the entire background */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .glass-card {
-            background: rgba(255,255,255,0.13);
-            box-shadow: 0 8px 32px 0 rgba(10,17,40,0.37);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border-radius: 18px;
-            border: 1.5px solid rgba(255,255,255,0.18);
-            padding: 50px 40px 60px 32px;
-            max-width: 370px;
-            width: 100%;
-            margin: 40px auto;
-            position: relative;
-        }
-        .close-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: #0A1128;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-title {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #222;
-            margin-bottom: 24px;
-            letter-spacing: 1px;
-        }
-        .form-group {
-            margin-bottom: 18px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        select {
-            width: 80%;
-            max-width: 250px;
-            padding: 8px 15px;
-            border: 1px solid #8CCDEB;
-            border-radius: 8px;
-            font-size: 1rem;
-            background: rgba(255,255,255,0.7);
-            color: #222;
-            margin-bottom: 8px;
-            text-align: center;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 16px;
-            padding-right: 30px;
-        }
-        input[type="text"], input[type="password"] {
-            width: 95%;
-            padding: 10px 10px 10px 10px;
-            border: 1px solid #8CCDEB;
-            border-radius: 8px;
-            font-size: 1rem;
-            background: rgba(255,255,255,0.7);
-            color: #222;
-            margin-bottom: 8px;
-            text-align: left;
-        }
-        .input-icon {
-            position: absolute;
-            right: 10px;
-            top: 40%;
-            transform: translateY(-50%);
-            color: #0A1128;
-            font-size: 1.1rem;
-        }
-        .input-wrapper {
-            position: relative;
-            width: 100%;
-        }
-        .remember-me {
-            display: flex;
-            align-items: center;
-            font-size: 1rem;
-            margin-bottom: 5px;
-            margin-top: -5px;
-            width: 100%;
-            justify-content: space-between;
-        }
-        .remember-me input[type="checkbox"] {
-            transform: scale(1.1);
-            margin-right: 8px;
-        }
-        .remember-me label {
-            margin-bottom: 0;
-            flex-grow: 1;
-        }
-        .forgot-link {
-            margin-left: auto;
-            font-size: 0.97rem;
-            color: #0A1128;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-            width: 100%;
-            margin: 10px auto;
-        }
-        .btn-login, .btn-cancel {
-            flex: 1;
-            padding: 8px 0;
-            border: none;
-            border-radius: 18px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-login {
-            background: #0A1128;
-            color: #fff;
-        }
-        .btn-login:hover {
-            background: #1B263B;
-        }
-        .btn-cancel {
-            background: #fff;
-            color: #0A1128;
-            border: 1px solid #0A1128;
-        }
-        .btn-cancel:hover {
-            background: #D9F3FC;
-        }
-        .register-link {
-            text-align: center;
-            margin-top: 14px;
-            font-size: 0.97rem;
-            color: #222;
-        }
-        .register-link a {
-            color: #0A1128;
-            text-decoration: underline;
-        }
-        @media (max-width: 500px) {
-            .glass-card { padding: 18px 6vw; }
-        }
-    </style>
-    <!-- Bootstrap Icons CDN for icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
-    <div class="glass-card">
-        <button class="close-btn" onclick="window.location.href='/'"><i class="bi bi-x-lg"></i></button>
-        <div class="login-title">E-PKH</div>
-        <form action="{{ url('login') }}" method="post">
-            @csrf
-            <div class="form-group">
-                <select name="role" required>
-                    <option value="">----Pilih sebagai----</option>
-                    <option value="admin">Admin</option>
-                    <option value="pendamping">Pendamping</option>
-                    <option value="penerima">Penerima Bansos</option>
-                </select>
+<body class="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 font-['Poppins'] flex items-center justify-center p-4">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="4"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+    
+    <!-- Login Card -->
+    <div class="relative w-full max-w-md">
+        <!-- Glass Card -->
+        <div class="backdrop-blur-lg bg-white/20 border border-white/30 rounded-2xl shadow-2xl p-6 md:p-8 relative">
+            <!-- Close Button -->
+            <button onclick="window.location.href='/'" 
+                    class="absolute top-4 right-4 w-8 h-8 bg-gray-900/80 hover:bg-gray-900 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110">
+                <i class="bi bi-x-lg text-sm"></i>
+            </button>
+
+            <!-- Logo and Title -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="bi bi-shield-lock text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">E-PKH</h1>
+                <p class="text-gray-700 font-medium">Masuk ke akun Anda</p>
             </div>
-            <div class="form-group input-wrapper">
-                <input type="text" name="nik" placeholder="NIK" required>
-                <span class="input-icon"><i class="bi bi-person-badge"></i></span>
+
+            <!-- Error Messages -->
+            @if($errors->any())
+                <div class="mb-6 p-4 bg-red-100/80 border border-red-300 rounded-xl">
+                    <div class="flex items-center">
+                        <i class="bi bi-exclamation-triangle text-red-600 mr-2"></i>
+                        <span class="text-red-700 font-medium">Terjadi kesalahan:</span>
+                    </div>
+                    <ul class="mt-2 text-sm text-red-600 list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <!-- Login Form -->
+            <form action="{{ url('login') }}" method="post" class="space-y-6">
+                @csrf
+                
+                <!-- Role Selection -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-800">Masuk sebagai</label>
+                    <div class="relative">
+                        <select name="role" required 
+                                class="w-full px-4 py-3 bg-white/70 border border-white/50 rounded-xl text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 appearance-none cursor-pointer hover:bg-white/80">
+                            <option value="">Pilih peran Anda</option>
+                            <option value="admin">Admin</option>
+                            <option value="pendamping">Pendamping</option>
+                            <option value="penerima">Penerima Bansos</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                            <i class="bi bi-chevron-down text-gray-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NIK Input -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-800">NIK</label>
+                    <div class="relative">
+                        <input type="text" name="nik" placeholder="Masukkan NIK Anda" required
+                               class="w-full px-4 py-3 pl-12 bg-white/70 border border-white/50 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white/80"
+                               value="{{ old('nik') }}">
+                        <div class="absolute inset-y-0 left-0 flex items-center px-4">
+                            <i class="bi bi-person-badge text-gray-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-800">Kata Sandi</label>
+                    <div class="relative">
+                        <input type="password" name="password" placeholder="Masukkan kata sandi" required id="passwordInput"
+                               class="w-full px-4 py-3 pl-12 pr-12 bg-white/70 border border-white/50 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white/80">
+                        <div class="absolute inset-y-0 left-0 flex items-center px-4">
+                            <i class="bi bi-lock text-gray-600"></i>
+                        </div>
+                        <button type="button" onclick="togglePassword()" 
+                                class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 hover:text-gray-800 transition-colors duration-300">
+                            <i class="bi bi-eye-slash" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" name="remember" 
+                               class="w-4 h-4 text-blue-600 bg-white/70 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                        <span class="text-sm font-medium text-gray-800">Ingatkan saya</span>
+                    </label>
+                    <a href="{{ url('password/reset') }}" 
+                       class="text-sm font-medium text-blue-700 hover:text-blue-800 transition-colors duration-300">
+                        Lupa kata sandi?
+                    </a>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button type="submit" 
+                            class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <i class="bi bi-box-arrow-in-right mr-2"></i>Masuk
+                    </button>
+                    <button type="button" onclick="window.location.href='/'" 
+                            class="flex-1 bg-white/80 text-gray-900 py-3 px-6 rounded-xl font-semibold text-lg border border-gray-300 hover:bg-white hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        <i class="bi bi-x-circle mr-2"></i>Batal
+                    </button>
+                </div>
+            </form>
+
+            <!-- Register Link -->
+            <div class="mt-8 text-center">
+                <p class="text-gray-800 font-medium">
+                    Belum memiliki akun? 
+                    <a href="{{ url('register') }}" 
+                       class="text-blue-700 hover:text-blue-800 font-semibold transition-colors duration-300 hover:underline">
+                        Daftar sekarang
+                    </a>
+                </p>
             </div>
-            <div class="form-group input-wrapper">
-                <input type="password" name="password" placeholder="Kata Sandi" required>
-                <span class="input-icon" style="cursor:pointer;" onclick="togglepassword(this)">
-                    <i class="bi bi-eye-slash" id="toggleIcon"></i>
-                </span>
-            </div>
-            <div class="remember-me">
-                <input type="checkbox" name="remember" id="remember" style="margin-right:6px;">
-                <label for="remember" style="margin-bottom:0;">Ingatkan Saya</label>
-                <span class="forgot-link" onclick="window.location.href='{{ url('password/reset') }}'">Lupa Kata Sandi</span>
-            </div>
-            <div class="btn-group">
-                <button type="submit" class="btn-login">Masuk</button>
-                <button type="button" class="btn-cancel" onclick="window.location.href='/'">Batal</button>
-            </div>
-        </form>
-        <div class="register-link">
-            Belum memiliki akun? <a href="{{ url('register') }}">Daftar</a>
+
+            <!-- Decorative Elements -->
+            <div class="absolute -top-4 -left-4 w-8 h-8 bg-yellow-400 rounded-full opacity-60 animate-pulse"></div>
+            <div class="absolute -bottom-4 -right-4 w-6 h-6 bg-pink-400 rounded-full opacity-60 animate-pulse" style="animation-delay: 1s;"></div>
         </div>
+
+        <!-- Bottom Decorative Card -->
+        <div class="absolute -bottom-2 left-2 right-2 h-4 bg-white/10 rounded-xl blur-sm"></div>
+        <div class="absolute -bottom-4 left-4 right-4 h-4 bg-white/5 rounded-xl blur-sm"></div>
     </div>
+
+    <!-- JavaScript -->
     <script>
-        function togglepassword(el) {
-            const input = el.parentElement.querySelector('input[type="password"],input[type="text"]');
-            const icon = el.querySelector('i');
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
             } else {
-                input.type = "password";
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
             }
         }
+
+        // Add smooth animations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.querySelector('.backdrop-blur-lg');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease-out';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+
+        // Form validation feedback
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise animate-spin mr-2"></i>Masuk...';
+            submitBtn.disabled = true;
+        });
     </script>
 </body>
 </html>

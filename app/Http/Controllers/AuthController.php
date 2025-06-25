@@ -36,7 +36,9 @@ class AuthController extends Controller
                 case 'admin':
                     return redirect()->route('dashboard')->with('success', 'Selamat datang, Admin!');
                 case 'pendamping':
-                    return redirect()->route('pendamping.index')->with('success', 'Selamat datang, Pendamping!');
+                    return redirect()->route('dashboard')->with('success', 'Selamat datang, Pendamping!'); // Ubah ini
+                case 'penerima':
+                    return redirect()->route('dashboard')->with('success', 'Selamat datang, Penerima!');
                 default:
                     return redirect()->route('dashboard')->with('success', 'Selamat datang!');
             }
@@ -80,7 +82,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role
         ]);
-        
+         // Debugging: Cek apakah user berhasil dibuat
 
         // Jika mendaftar sebagai pendamping, buat data pendamping
         if ($request->role === 'pendamping') {

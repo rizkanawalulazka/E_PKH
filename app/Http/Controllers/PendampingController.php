@@ -15,6 +15,11 @@ class PendampingController extends Controller
     {
         $user = Auth::user();
 
+        // Jika user adalah penerima, redirect ke dashboard
+        if ($user->role === 'penerima') {
+            return redirect()->route('dashboard');
+        }
+
         // Jika user adalah pendamping atau admin, tampilkan daftar pendamping
         if ($user->role === 'pendamping' || $user->role === 'admin') {
             $pendampings = \App\Models\Pendamping::with('user')->get();
@@ -25,14 +30,8 @@ class PendampingController extends Controller
             ]);
         }
 
-        // Jika user adalah penerima, tampilkan info pendamping acak
-        $pendaftaran = \App\Models\Pendaftaran::where('nik', $user->nik)->where('status', 'approved')->latest()->first();
-        $pendamping = null;
-
-        if ($user->role === 'penerima' && $pendaftaran) {
-            $pendamping = \App\Models\Pendamping::with('user')->inRandomOrder()->first();
-        }
-        return view('pendamping.info-pendamping', compact('pendaftaran', 'pendamping'));
+        // Default fallback
+        return redirect()->route('dashboard');
     }
 
     public function daftarPenerima()
