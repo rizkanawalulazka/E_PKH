@@ -299,7 +299,7 @@
                             </svg>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Alamat</h3>
-                        <p class="text-gray-600">Jakarta, Indonesia</p>
+                        <p class="text-gray-600">Banda Aceh, Aceh</p>
                     </div>
 
                     <!-- Contact Card 4 -->
@@ -354,13 +354,13 @@
                     <ul class="space-y-2 text-gray-400">
                         <li>Email: info@pkh.go.id</li>
                         <li>Telepon: 021-1234-5678</li>
-                        <li>Jakarta, Indonesia</li>
+                        <li>Banda Aceh, Aceh</li>
                     </ul>
                 </div>
             </div>
             
             <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 E-PKH. Semua hak dilindungi.</p>
+                <p>&copy; 2025 E-PKH. Semua hak dilindungi.</p>
             </div>
         </div>
     </footer>

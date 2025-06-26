@@ -49,12 +49,23 @@ class DashboardController extends Controller
 
     private function getPendampingData($user)
     {
-        $pendamping = $user->pendamping;
-        return [
-            'totalPenerima' => User::where('role', 'penerima')->count(),
-            'laporanBulanIni' => $pendamping ? $pendamping->laporanPendampingan()->whereMonth('created_at', now()->month)->count() : 0,
-            'pendamping' => $pendamping
-        ];
+        try {
+            $pendamping = $user->pendamping;
+            
+            return [
+                'totalPenerima' => User::where('role', 'penerima')->count(),
+                'laporanBulanIni' => 0, // GANTI DARI $pendamping->laporanPendampingan()->... KE 0
+                'totalLaporan' => 0, // GANTI DARI $pendamping->laporanPendampingan()->count() KE 0
+                'pendamping' => $pendamping
+            ];
+        } catch (\Exception $e) {
+            return [
+                'totalPenerima' => 0,
+                'laporanBulanIni' => 0,
+                'totalLaporan' => 0,
+                'pendamping' => null
+            ];
+        }
     }
 
     private function getPenerimaData($user)

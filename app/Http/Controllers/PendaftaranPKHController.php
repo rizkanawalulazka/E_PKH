@@ -9,12 +9,15 @@ class PendaftaranPKHController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-        if ($user->role === 'admin') {
-            $pendaftaran = Pendaftaran::latest()->get();
+        // Ambil data berdasarkan role user
+        if (auth()->user()->role === 'admin') {
+            // Admin bisa lihat semua data
+            $pendaftaran = Pendaftaran::with('user')->latest()->get();
         } else {
-            $pendaftaran = Pendaftaran::where('nik', $user->nik)->latest()->get();
+            // User biasa hanya bisa lihat data sendiri berdasarkan user_id
+            $pendaftaran = Pendaftaran::where('id', auth()->id())->latest()->get();
         }
+
         return view('pendaftaran.index', compact('pendaftaran'));
     }
 
@@ -52,10 +55,9 @@ class PendaftaranPKHController extends Controller
             $pendaftaran->tanggal_lahir = $request->tanggal_lahir;
             $pendaftaran->alamat = $request->alamat;
             $pendaftaran->no_hp = $request->no_hp;
-            $pendaftaran->komponen = $request->komponen; // Pastikan ini array
+            $pendaftaran->komponen = $request->komponen;
             $pendaftaran->kartu_keluarga = $kartuKeluargaPath;
             $pendaftaran->status = 'pending';
-            $pendaftaran->user_id = auth()->id(); // Jika ada relasi dengan user
             $pendaftaran->save();
 
             return response()->json([

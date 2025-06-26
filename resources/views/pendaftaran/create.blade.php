@@ -110,11 +110,27 @@
 
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary" id="btnSubmit">
-                                <i class="fas fa-paper-plane mr-2"></i>Kirim Pendaftaran
+                                <span id="btnText">
+                                    <i class="fas fa-paper-plane mr-2"></i>Kirim Pendaftaran
+                                </span>
+                                <span id="btnLoader" style="display: none;">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>Mengirim Data...
+                                </span>
                             </button>
-                            <a href="{{ route('dashboard') }}" class="btn btn-secondary">
+                            <a href="{{ route('dashboard') }}" class="btn btn-secondary" id="btnKembali">
                                 <i class="fas fa-arrow-left mr-2"></i>Kembali
                             </a>
+                        </div>
+
+                        <!-- Loading Progress Bar -->
+                        <div id="loadingProgress" class="mt-3" style="display: none;">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 0%" id="progressBar">
+                                    <span id="progressText">0%</span>
+                                </div>
+                            </div>
+                            <small class="text-muted">Sedang mengunggah dan memproses data...</small>
                         </div>
                     </form>
                 </div>
@@ -154,8 +170,8 @@ $(document).ready(function() {
     $('#formPendaftaran').on('submit', function(e) {
         e.preventDefault();
         
-        // Disable submit button
-        $('#btnSubmit').prop('disabled', true);
+        // Show loading state
+        showLoading();
         
         var form = $(this)[0];
         var formData = new FormData(form);
@@ -166,27 +182,40 @@ $(document).ready(function() {
             data: formData,
             processData: false,
             contentType: false,
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                
+                // Upload progress
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        percentComplete = parseInt(percentComplete * 100);
+                        updateProgress(percentComplete);
+                    }
+                }, false);
+                
+                return xhr;
+            },
             success: function(response) {
-                if (response.success) {
-                    // Show success modal
-                    $('#successMessage').text(response.message);
-                    $('#successModal').modal('show');
+                console.log('Response:', response); // Debug
+                
+                // Complete progress
+                updateProgress(100);
+                
+                setTimeout(function() {
+                    hideLoading();
                     
-                    // Reset form
-                    $('#formPendaftaran')[0].reset();
-                } else {
-                    // Show error alert
-                    $('#alert-container').html(
-                        '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                        response.message +
-                        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                        '<span aria-hidden="true">&times;</span></button></div>'
-                    );
-                }
+                    if (response.success) {
+                        $('#successMessage').text(response.message);
+                        $('#successModal').modal('show');
+                        $('#formPendaftaran')[0].reset();
+                    }
+                }, 500);
             },
             error: function(xhr) {
-                // Enable submit button
-                $('#btnSubmit').prop('disabled', false);
+                console.log('Error:', xhr); // Debug
+                
+                hideLoading();
                 
                 if (xhr.status === 422) {
                     // Validation errors
@@ -217,8 +246,51 @@ $(document).ready(function() {
     
     // Reset form on modal close
     $('#successModal').on('hidden.bs.modal', function() {
-        $('#btnSubmit').prop('disabled', false);
+        hideLoading();
     });
+    
+    // Loading functions
+    function showLoading() {
+        // Disable form elements
+        $('#btnSubmit').prop('disabled', true);
+        $('#btnKembali').prop('disabled', true);
+        $('#formPendaftaran input, #formPendaftaran select, #formPendaftaran textarea').prop('disabled', true);
+        
+        // Change button appearance
+        $('#btnText').hide();
+        $('#btnLoader').show();
+        
+        // Show progress bar
+        $('#loadingProgress').show();
+        updateProgress(0);
+        
+        // Scroll to top to show progress
+        $('html, body').animate({scrollTop: 0}, 500);
+    }
+    
+    function hideLoading() {
+        // Enable form elements
+        $('#btnSubmit').prop('disabled', false);
+        $('#btnKembali').prop('disabled', false);
+        $('#formPendaftaran input, #formPendaftaran select, #formPendaftaran textarea').prop('disabled', false);
+        
+        // Reset button appearance
+        $('#btnText').show();
+        $('#btnLoader').hide();
+        
+        // Hide progress bar
+        $('#loadingProgress').hide();
+    }
+    
+    function updateProgress(percent) {
+        $('#progressBar').css('width', percent + '%');
+        $('#progressText').text(percent + '%');
+        
+        if (percent >= 100) {
+            $('#progressBar').removeClass('progress-bar-striped progress-bar-animated');
+            $('#progressBar').addClass('bg-success');
+        }
+    }
 });
 </script>
-@endsection 
+@endsection

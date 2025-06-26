@@ -9,8 +9,8 @@ class Pendaftaran extends Model
 {
     use HasFactory;
 
-    protected $table = 'pendaftaran';
-
+    protected $table = 'pendaftaran'; // Sesuaikan dengan nama tabel
+    
     protected $fillable = [
         'nik',
         'nama',
@@ -19,13 +19,18 @@ class Pendaftaran extends Model
         'alamat',
         'no_hp',
         'komponen',
+        'kartu_keluarga',
         'status',
-        'additional_data'
     ];
 
     protected $casts = [
-        'komponen' => 'array',
-        'additional_data' => 'array',
+        'komponen' => 'array', // Penting untuk menyimpan array
         'tanggal_lahir' => 'date'
     ];
-} 
+
+    // Relasi dengan user jika diperlukan
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}

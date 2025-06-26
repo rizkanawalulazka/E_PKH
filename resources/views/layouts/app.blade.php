@@ -107,14 +107,14 @@
                         <i class="fas fa-fw fa-table"></i>
                         <span>Data Pendaftaran PKH</span></a>
                 </li>
-                @endif
+                @endif  
             @endauth
 
             <!-- Nav Item - Daftar PKH untuk penerima -->
             @auth
                 @if(auth()->user()->role == 'penerima')
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('pendaftaran.pkh.create') }}">
+                    <a class="nav-link" href="/pendaftaran/create">
                         <i class="fas fa-fw fa-table"></i>
                         <span>Daftar PKH</span></a>
                 </li>
@@ -384,7 +384,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2020</span>
+                        <span>Copyright &copy; Your Website 2025</span>
                     </div>
                 </div>
             </footer>

@@ -27,22 +27,27 @@ class AuthController extends Controller
             'password.required' => 'Password wajib diisi.',
         ]);
 
-        if (Auth::attempt(['nik' => $request->nik, 'password' => $request->password])) {
-            $request->session()->regenerate();
-            
-            // Redirect berdasarkan role
-            $user = Auth::user();
-            switch($user->role) {
-                case 'admin':
-                    return redirect()->route('dashboard')->with('success', 'Selamat datang, Admin!');
-                case 'pendamping':
-                    return redirect()->route('dashboard')->with('success', 'Selamat datang, Pendamping!'); // Ubah ini
-                case 'penerima':
-                    return redirect()->route('dashboard')->with('success', 'Selamat datang, Penerima!');
-                default:
-                    return redirect()->route('dashboard')->with('success', 'Selamat datang!');
-            }
+        $credentials = [
+            'nik' => $request->nik,
+            'password' => $request->password,
+        ];
+
+        if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        
+        $user = Auth::user();
+        
+        // SEMUA ROLE DIARAHKAN KE DASHBOARD
+        if ($user->role === 'admin') {
+            return redirect()->intended('/dashboard');
+        } elseif ($user->role === 'pendamping') {
+            return redirect()->intended('/dashboard'); // UBAH INI DARI /pendamping KE /dashboard
+        } elseif ($user->role === 'penerima' || $user->role === 'user') {
+            return redirect()->intended('/dashboard'); // PASTIKAN KE DASHBOARD
+        } else {
+            return redirect()->intended('/dashboard'); // DEFAULT KE DASHBOARD
         }
+    }
 
         return back()->withErrors([
             'nik' => 'NIK atau password salah.',

@@ -10,15 +10,14 @@ return new class extends Migration
     {
         Schema::create('pendaftaran', function (Blueprint $table) {
             $table->id();
-            $table->string('nik', 16)->unique();
+            $table->string('nik', 16);
             $table->string('nama');
             $table->string('tempat_lahir');
             $table->date('tanggal_lahir');
             $table->text('alamat');
             $table->string('no_hp', 13);
-            $table->json('komponen');
-            $table->string('status')->default('pending');
-            $table->json('additional_data')->nullable();
+            $table->string('kartu_keluarga')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }
@@ -27,4 +26,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('pendaftaran');
     }
-}; 
+};
