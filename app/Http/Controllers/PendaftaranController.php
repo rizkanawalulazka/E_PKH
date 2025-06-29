@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 
-class PendaftaranPKHController extends Controller
+class PendaftaranController extends Controller
 {
     public function index()
     {

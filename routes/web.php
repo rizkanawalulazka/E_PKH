@@ -24,11 +24,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // PKH Registration routes
-    Route::get('/pendaftaran', [PendaftaranPKHController::class, 'index'])->name('pendaftaran.pkh.index');
-    Route::get('/pendaftaran/create', [PendaftaranPKHController::class, 'create'])->name('pendaftaran.pkh.create');
-    Route::post('/pendaftaran', [PendaftaranPKHController::class, 'store'])->name('pendaftaran.pkh.store'); // PERBAIKI URL
-    Route::post('/pendaftaran/{id}/approve', [PendaftaranPKHController::class, 'approve'])->name('pendaftaran.pkh.approve');
-    Route::post('/pendaftaran/{id}/reject', [PendaftaranPKHController::class, 'reject'])->name('pendaftaran.pkh.reject');
+    Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('pendaftaran.pkh.index');
+    Route::get('/pendaftaran/create', [PendaftaranController::class, 'create'])->name('pendaftaran.pkh.create');
+    Route::post('/pendaftaran', [PendaftaranController::class, 'store'])->name('pendaftaran.pkh.store'); // PERBAIKI URL
+    Route::post('/pendaftaran/{id}/approve', [PendaftaranController::class, 'approve'])->name('pendaftaran.pkh.approve');
+    Route::post('/pendaftaran/{id}/reject', [PendaftaranController::class, 'reject'])->name('pendaftaran.pkh.reject');
     
     // Pendamping routes
     Route::get('/pendamping', [PendampingController::class, 'index'])->name('pendamping.index');

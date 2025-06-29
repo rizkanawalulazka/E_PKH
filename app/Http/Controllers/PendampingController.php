@@ -7,7 +7,7 @@ use App\Models\Pendamping;
 use Illuminate\Http\Request;
 use App\Models\LaporanPendampingan;
 use Illuminate\Support\Facades\Auth;
-use App\Models\PendaftaranPKH;
+use App\Models\Pendaftaran;
 
 class PendampingController extends Controller
 {

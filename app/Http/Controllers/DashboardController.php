@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Pendamping;
-use App\Models\PendaftaranPKH;
+use App\Models\Pendaftaran;
 
 class DashboardController extends Controller
 {
@@ -42,8 +42,8 @@ class DashboardController extends Controller
         return [
             'totalPendamping' => User::where('role', 'pendamping')->count(),
             'totalPenerima' => User::where('role', 'penerima')->count(),
-            'totalPendaftaran' => PendaftaranPKH::count(),
-            'pendaftaranPending' => PendaftaranPKH::where('status', 'pending')->count(),
+            'totalPendaftaran' => Pendaftaran::count(),
+            'pendaftaranPending' => Pendaftaran::where('status', 'pending')->count(),
         ];
     }
 
@@ -70,7 +70,7 @@ class DashboardController extends Controller
 
     private function getPenerimaData($user)
     {
-        $pendaftaran = PendaftaranPKH::where('user_id', $user->id)->latest()->first();
+        $pendaftaran = Pendaftaran::where('user_id', $user->id)->latest()->first();
         $pendamping = null;
         
         if ($pendaftaran && $pendaftaran->status === 'disetujui') {
