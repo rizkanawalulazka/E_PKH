@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('pendaftaran', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('nik', 16);
+            $table->string('nik', 16)->unique(); // NIK harus unik
             $table->string('nama', 255);
             $table->string('tempat_lahir', 255);
             $table->date('tanggal_lahir');
             $table->text('alamat');
-            $table->string('no_hp', 13);
+            $table->string('no_hp', 15); // Perbesar untuk menampung 15 digit
             $table->json('komponen'); // Untuk menyimpan array komponen PKH
-            $table->string('kartu_keluarga')->nullable(); // Path file kartu keluarga
+            $table->string('kartu_keluarga', 500)->nullable(); // Path file kartu keluarga, perbesar untuk path yang panjang
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('catatan_admin')->nullable(); // Catatan dari admin saat approve/reject
             $table->timestamp('approved_at')->nullable(); // Kapan disetujui

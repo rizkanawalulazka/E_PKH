@@ -71,7 +71,7 @@
                             <label for="no_hp" class="text-dark">Nomor HP <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('no_hp') is-invalid @enderror" 
                                    id="no_hp" name="no_hp" value="{{ old('no_hp') }}" 
-                                   placeholder="Masukkan nomor HP" maxlength="13" required>
+                                   placeholder="Masukkan nomor HP" maxlength="15" required>
                         </div>
 
                         <div class="form-group">
@@ -167,21 +167,155 @@
 @section('scripts')
 <script>
 $(document).ready(function() {
+    // Setup CSRF token untuk semua AJAX request
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    // Validasi form sebelum submit
+    function validateForm() {
+        let isValid = true;
+        let errorMessage = '';
+
+        // Reset previous validation states
+        $('.form-control, .form-control-file').removeClass('is-invalid');
+        $('#alert-container').empty();
+
+        // Validasi NIK
+        const nik = $('#nik').val().trim();
+        if (nik === '') {
+            $('#nik').addClass('is-invalid');
+            errorMessage += 'NIK wajib diisi.<br>';
+            isValid = false;
+        } else if (nik.length !== 16 || !/^\d+$/.test(nik)) {
+            $('#nik').addClass('is-invalid');
+            errorMessage += 'NIK harus 16 digit angka.<br>';
+            isValid = false;
+        }
+
+        // Validasi nama
+        const nama = $('#nama').val().trim();
+        if (nama === '') {
+            $('#nama').addClass('is-invalid');
+            errorMessage += 'Nama lengkap wajib diisi.<br>';
+            isValid = false;
+        }
+
+        // Validasi tempat lahir
+        const tempatLahir = $('#tempat_lahir').val().trim();
+        if (tempatLahir === '') {
+            $('#tempat_lahir').addClass('is-invalid');
+            errorMessage += 'Tempat lahir wajib diisi.<br>';
+            isValid = false;
+        }
+
+        // Validasi tanggal lahir
+        const tanggalLahir = $('#tanggal_lahir').val();
+        if (tanggalLahir === '') {
+            $('#tanggal_lahir').addClass('is-invalid');
+            errorMessage += 'Tanggal lahir wajib diisi.<br>';
+            isValid = false;
+        } else {
+            const today = new Date();
+            const birthDate = new Date(tanggalLahir);
+            if (birthDate >= today) {
+                $('#tanggal_lahir').addClass('is-invalid');
+                errorMessage += 'Tanggal lahir tidak valid.<br>';
+                isValid = false;
+            }
+        }
+
+        // Validasi alamat
+        const alamat = $('#alamat').val().trim();
+        if (alamat === '') {
+            $('#alamat').addClass('is-invalid');
+            errorMessage += 'Alamat lengkap wajib diisi.<br>';
+            isValid = false;
+        } else if (alamat.length < 10) {
+            $('#alamat').addClass('is-invalid');
+            errorMessage += 'Alamat terlalu pendek (minimal 10 karakter).<br>';
+            isValid = false;
+        }
+
+        // Validasi nomor HP
+        const noHp = $('#no_hp').val().trim();
+        if (noHp === '') {
+            $('#no_hp').addClass('is-invalid');
+            errorMessage += 'Nomor HP wajib diisi.<br>';
+            isValid = false;
+        } else if (noHp.length < 10 || noHp.length > 15 || !/^\d+$/.test(noHp)) {
+            $('#no_hp').addClass('is-invalid');
+            errorMessage += 'Nomor HP harus 10-15 digit angka.<br>';
+            isValid = false;
+        }
+
+        // Validasi komponen bantuan
+        const komponenChecked = $('input[name="komponen[]"]:checked').length;
+        if (komponenChecked === 0) {
+            errorMessage += 'Pilih minimal satu komponen bantuan.<br>';
+            isValid = false;
+        }
+
+        // Validasi file kartu keluarga
+        const fileInput = $('#kartu_keluarga')[0];
+        if (!fileInput.files.length) {
+            $('#kartu_keluarga').addClass('is-invalid');
+            errorMessage += 'Kartu keluarga wajib diunggah.<br>';
+            isValid = false;
+        } else {
+            const file = fileInput.files[0];
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            const maxSize = 2048 * 1024; // 2MB in bytes
+
+            if (!allowedTypes.includes(file.type)) {
+                $('#kartu_keluarga').addClass('is-invalid');
+                errorMessage += 'Format file harus JPG, JPEG, atau PNG.<br>';
+                isValid = false;
+            } else if (file.size > maxSize) {
+                $('#kartu_keluarga').addClass('is-invalid');
+                errorMessage += 'Ukuran file maksimal 2MB.<br>';
+                isValid = false;
+            }
+        }
+
+        // Tampilkan error jika ada
+        if (!isValid) {
+            $('#alert-container').html(
+                '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                '<strong>Perhatian!</strong><br>' + errorMessage +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span></button></div>'
+            );
+            $('html, body').animate({scrollTop: 0}, 500);
+        }
+
+        return isValid;
+    }
+
     $('#formPendaftaran').on('submit', function(e) {
         e.preventDefault();
-        
-        // Show loading state
-        showLoading();
-        
+
+        // Validasi form terlebih dahulu
+        if (!validateForm()) {
+            return false;
+        }
+
+        // Ambil data form SEBELUM field di-disable!
         var form = $(this)[0];
         var formData = new FormData(form);
-        
+
+        // Baru setelah itu, disable tombol/form
+        showLoading();
+
         $.ajax({
             url: $(this).attr('action'),
             method: 'POST',
             data: formData,
             processData: false,
             contentType: false,
+            timeout: 30000, // 30 seconds timeout
             xhr: function() {
                 var xhr = new window.XMLHttpRequest();
                 
@@ -209,40 +343,55 @@ $(document).ready(function() {
                         $('#successMessage').text(response.message);
                         $('#successModal').modal('show');
                         $('#formPendaftaran')[0].reset();
+                        $('#alert-container').empty();
+                    } else {
+                        showAlert('danger', response.message || 'Pendaftaran gagal diproses.');
                     }
                 }, 500);
             },
-            error: function(xhr) {
-                console.log('Error:', xhr); // Debug
+            error: function(xhr, status, error) {
+                console.log('Error:', xhr.responseJSON, status, error); // Debug
                 
                 hideLoading();
                 
                 if (xhr.status === 422) {
                     // Validation errors
-                    var errors = xhr.responseJSON.errors;
-                    var errorMessage = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                        '<ul class="mb-0">';
-                    
-                    $.each(errors, function(key, value) {
-                        errorMessage += '<li>' + value[0] + '</li>';
-                    });
-                    
-                    errorMessage += '</ul><button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                        '<span aria-hidden="true">&times;</span></button></div>';
-                    
-                    $('#alert-container').html(errorMessage);
+                    var response = xhr.responseJSON;
+                    if (response.errors) {
+                        var errorMessage = '<strong>Data tidak valid:</strong><ul class="mb-0 mt-2">';
+                        
+                        $.each(response.errors, function(key, value) {
+                            errorMessage += '<li>' + value[0] + '</li>';
+                            // Highlight invalid fields
+                            $('[name="' + key + '"]').addClass('is-invalid');
+                        });
+                        
+                        errorMessage += '</ul>';
+                        showAlert('danger', errorMessage);
+                    } else {
+                        showAlert('danger', response.message || 'Data yang dimasukkan tidak valid.');
+                    }
+                } else if (xhr.status === 500) {
+                    showAlert('danger', 'Terjadi kesalahan server. Silakan coba lagi atau hubungi administrator.');
+                } else if (status === 'timeout') {
+                    showAlert('warning', 'Koneksi terputus. Silakan periksa koneksi internet dan coba lagi.');
                 } else {
-                    // General error
-                    $('#alert-container').html(
-                        '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                        'Terjadi kesalahan saat memproses pendaftaran. Silakan coba lagi.' +
-                        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                        '<span aria-hidden="true">&times;</span></button></div>'
-                    );
+                    showAlert('danger', 'Terjadi kesalahan tidak terduga. Silakan coba lagi.');
                 }
             }
         });
     });
+    
+    // Helper function untuk menampilkan alert
+    function showAlert(type, message) {
+        $('#alert-container').html(
+            '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+            message +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span></button></div>'
+        );
+        $('html, body').animate({scrollTop: 0}, 500);
+    }
     
     // Reset form on modal close
     $('#successModal').on('hidden.bs.modal', function() {
@@ -291,6 +440,15 @@ $(document).ready(function() {
             $('#progressBar').addClass('bg-success');
         }
     }
+
+    // Real-time validation
+    $('#nik').on('input', function() {
+        $(this).val($(this).val().replace(/\D/g, '').substring(0, 16));
+    });
+
+    $('#no_hp').on('input', function() {
+        $(this).val($(this).val().replace(/\D/g, '').substring(0, 15));
+    });
 });
 </script>
 @endsection

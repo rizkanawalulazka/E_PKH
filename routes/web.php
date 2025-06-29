@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PendampingController;
-use App\Http\Controllers\PendaftaranPKHController;
+use App\Http\Controllers\PendaftaranController;
 
 // Public routes
 Route::get('/', function () {
@@ -26,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     // PKH Registration routes
     Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('pendaftaran.pkh.index');
     Route::get('/pendaftaran/create', [PendaftaranController::class, 'create'])->name('pendaftaran.pkh.create');
-    Route::post('/pendaftaran', [PendaftaranController::class, 'store'])->name('pendaftaran.pkh.store'); // PERBAIKI URL
+    Route::post('/pendaftaran', [PendaftaranController::class, 'store'])->name('pendaftaran.pkh.store');
     Route::post('/pendaftaran/{id}/approve', [PendaftaranController::class, 'approve'])->name('pendaftaran.pkh.approve');
     Route::post('/pendaftaran/{id}/reject', [PendaftaranController::class, 'reject'])->name('pendaftaran.pkh.reject');
     
