@@ -45,14 +45,14 @@ class PendampingController extends Controller
             foreach ($penerima as $p) {
                 // Ambil laporan terbaru untuk penerima ini dari pendamping yang sedang login
                 $latestReport = LaporanPendampingan::where('pendamping_id', $pendampingProfile->id)
-                                                      ->where('penerima_id', $p->id)
-                                                      ->latest('tanggal') // Urutkan berdasarkan tanggal terbaru
-                                                      ->first();
-                
+                    ->where('penerima_id', $p->id)
+                    ->latest('tanggal') // Urutkan berdasarkan tanggal terbaru
+                    ->first();
+
                 $p->report_status = $latestReport ? $latestReport->status : null;
             }
         }
-        
+
         return view('pendamping.index', [
             'penerima' => $penerima,
             'title' => 'Daftar Penerima Bantuan',
@@ -116,9 +116,9 @@ class PendampingController extends Controller
         }
 
         $latestReport = LaporanPendampingan::where('pendamping_id', $pendampingProfile->id)
-                                            ->where('penerima_id', $penerima_id)
-                                            ->latest('tanggal')
-                                            ->first();
+            ->where('penerima_id', $penerima_id)
+            ->latest('tanggal')
+            ->first();
 
         if (!$latestReport) {
             return response()->json(['success' => false, 'message' => 'Belum ada laporan untuk penerima ini.'], 404);
@@ -168,18 +168,63 @@ class PendampingController extends Controller
         return redirect()->back()->with('success', 'Laporan berhasil ditolak.');
     }
 
+
     public function infoPendamping()
     {
         $user = auth()->user();
-        // Cek status pendaftaran (bisa dari pendaftaran atau pendaftaran_pkh, sesuaikan kebutuhan)
-        $pendaftaran = \App\Models\Pendaftaran::where('nik', $user->nik)->where('status', 'approved')->latest()->first();
+
+        // Cek status pendaftaran berdasarkan user_id (bukan NIK)
+        $pendaftaran = \App\Models\Pendaftaran::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->with('pendamping.user') // Eager loading pendamping
+            ->latest()
+            ->first();
+
         $pendamping = null;
 
         if ($user->role === 'penerima' && $pendaftaran) {
-            // Ambil satu pendamping acak dari user seeder (role pendamping)
-            $pendamping = \App\Models\Pendamping::with('user')->inRandomOrder()->first();
+            // Ambil pendamping yang sudah ditetapkan dari relasi database
+            $pendamping = $pendaftaran->pendamping;
+
+            // Jika belum ada pendamping yang ditetapkan, assign secara otomatis
+            if (!$pendamping) {
+                $pendamping = $this->assignPendampingToPendaftaran($pendaftaran);
+
+                // Update pendaftaran dengan pendamping yang baru di-assign
+                if ($pendamping) {
+                    $pendaftaran->pendamping_id = $pendamping->id;
+                    $pendaftaran->save();
+
+                    // Refresh relasi
+                    $pendaftaran->load('pendamping.user');
+                    $pendamping = $pendaftaran->pendamping;
+                }
+            }
         }
 
         return view('pendamping.info-pendamping', compact('pendaftaran', 'pendamping'));
+    }
+
+    /**
+     * Assign pendamping berdasarkan load balancing (pendamping dengan penerima paling sedikit)
+     */
+    private function assignPendampingToPendaftaran($pendaftaran)
+    {
+        try {
+            // Cari pendamping dengan jumlah penerima paling sedikit
+            $pendamping = \App\Models\Pendamping::withCount([
+                'pendaftaran' => function ($query) {
+                    $query->where('status', 'approved');
+                }
+            ])
+                ->orderBy('pendaftaran_count', 'asc')
+                ->orderBy('id', 'asc') // Tie-breaker untuk konsistensi
+                ->first();
+
+            return $pendamping;
+        } catch (\Exception $e) {
+            // Fallback: ambil pendamping pertama jika terjadi error
+            return \App\Models\Pendamping::with('user')->first();
+        }
     }
 }

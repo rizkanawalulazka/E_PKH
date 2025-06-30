@@ -79,7 +79,7 @@ class PendaftaranController extends Controller
                 'errors' => $e->errors(),
                 'request_data' => $request->except(['kartu_keluarga'])
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Data tidak valid',
@@ -152,10 +152,29 @@ class PendaftaranController extends Controller
     // Tambahkan method untuk admin menerima/menolak pendaftaran
     public function approve($id)
     {
-        $pendaftaran = Pendaftaran::findOrFail($id);
-        $pendaftaran->status = 'approved';
-        $pendaftaran->save();
-        return redirect()->back()->with('success', 'Pendaftaran berhasil disetujui.');
+        try {
+            $pendaftaran = \App\Models\Pendaftaran::findOrFail($id);
+            
+            // Update status ke approved
+            $pendaftaran->status = 'approved';
+            $pendaftaran->approved_at = now();
+            
+            // Auto-assign pendamping jika belum ada
+            if (!$pendaftaran->pendamping_id) {
+                $pendamping = $this->assignPendamping();
+                if ($pendamping) {
+                    $pendaftaran->pendamping_id = $pendamping->id;
+                }
+            }
+            
+            $pendaftaran->save();
+           return redirect()->back()->with('success', 'Pendaftaran berhasil disetujui.');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function reject($id)
@@ -164,5 +183,27 @@ class PendaftaranController extends Controller
         $pendaftaran->status = 'rejected';
         $pendaftaran->save();
         return redirect()->back()->with('success', 'Pendaftaran berhasil ditolak.');
+    }
+
+    /**
+     * Assign pendamping berdasarkan load balancing
+     * Mengambil pendamping dengan jumlah penerima paling sedikit
+     */
+    private function assignPendamping()
+    {
+        try {
+            // Cari pendamping dengan jumlah penerima yang sudah approved paling sedikit
+            $pendamping = \App\Models\Pendamping::withCount(['pendaftaran' => function($query) {
+                            $query->where('status', 'approved');
+                        }])
+                        ->orderBy('pendaftaran_count', 'asc') // Yang paling sedikit penerima
+                        ->orderBy('id', 'asc') // Tie-breaker untuk konsistensi
+                        ->first();
+            
+            return $pendamping;
+        } catch (\Exception $e) {
+            // Fallback: ambil pendamping pertama jika terjadi error
+            return \App\Models\Pendamping::first();
+        }
     }
 }

@@ -13,6 +13,7 @@ class Pendaftaran extends Model
     
     protected $fillable = [
         'user_id',
+        'pendamping_id', // TAMBAHKAN INI
         'nik',
         'nama',
         'tempat_lahir',
@@ -23,7 +24,7 @@ class Pendaftaran extends Model
         'kartu_keluarga',
         'status',
         'catatan_admin',
-        'approved_at',
+        'approved_at'
     ];
 
     protected $casts = [
@@ -36,5 +37,11 @@ class Pendaftaran extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Relasi ke Pendamping - TAMBAHKAN INI
+    public function pendamping()
+    {
+        return $this->belongsTo(Pendamping::class);
     }
 }
