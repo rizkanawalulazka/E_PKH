@@ -24,7 +24,8 @@ class Pendaftaran extends Model
         'kartu_keluarga',
         'status',
         'catatan_admin',
-        'approved_at'
+        'approved_at',
+        'rejected_at'
     ];
 
     protected $casts = [

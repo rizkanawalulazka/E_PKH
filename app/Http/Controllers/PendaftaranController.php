@@ -206,4 +206,55 @@ class PendaftaranController extends Controller
             return \App\Models\Pendamping::first();
         }
     }
+
+    // Tambahkan method ini
+    public function updateStatusPendaftaran(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'status' => 'required|in:pending,approved,rejected',
+            ]);
+
+            $pendaftaran = \App\Models\Pendaftaran::findOrFail($id);
+            $oldStatus = $pendaftaran->status;
+            
+            // Update status
+            $pendaftaran->status = $request->status;
+            
+            // Hanya set approved_at, HAPUS bagian rejected_at
+            if ($request->status == 'approved') {
+                $pendaftaran->approved_at = now();
+            } else {
+                // Reset approved_at jika status bukan approved
+                $pendaftaran->approved_at = null;
+            }
+            
+            $pendaftaran->save();
+
+            // Log aktivitas
+            \Log::info('Status pendaftaran diubah', [
+                'id' => $id,
+                'old_status' => $oldStatus,
+                'new_status' => $request->status,
+                'admin' => auth()->user()->name
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diubah dari ' . $oldStatus . ' menjadi ' . $request->status
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error updating pendaftaran status', [
+                'id' => $id,
+                'status' => $request->status,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

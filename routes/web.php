@@ -22,14 +22,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
     // Dashboard route - PINDAH KE SINI
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // PKH Registration routes
     Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('pendaftaran.pkh.index');
     Route::get('/pendaftaran/create', [PendaftaranController::class, 'create'])->name('pendaftaran.pkh.create');
     Route::post('/pendaftaran', [PendaftaranController::class, 'store'])->name('pendaftaran.pkh.store');
     Route::post('/pendaftaran/{id}/approve', [PendaftaranController::class, 'approve'])->name('pendaftaran.pkh.approve');
     Route::post('/pendaftaran/{id}/reject', [PendaftaranController::class, 'reject'])->name('pendaftaran.pkh.reject');
-    
+
     // Pendamping routes
     Route::get('/pendamping', [PendampingController::class, 'index'])->name('pendamping.index');
     Route::get('/pendamping/penerima', [PendampingController::class, 'daftarPenerima'])->name('pendamping.penerima');
@@ -40,4 +40,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pendamping/laporan/{id}/reject', [PendampingController::class, 'rejectLaporan'])->name('pendamping.laporan.reject');
     Route::get('/pendamping/info', [PendampingController::class, 'infoPendamping'])->name('pendamping.info');
     Route::post('/pendamping/penerima/{penerima_id}/update-status', [PendampingController::class, 'updatePenerimaReportStatus'])->name('pendamping.penerima.update_status');
+
+    Route::post('/admin/pendaftaran/{id}/update-status', [PendaftaranController::class, 'updateStatusPendaftaran'])->name('admin.pendaftaran.update-status');
 });
+
+

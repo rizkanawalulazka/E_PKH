@@ -37,25 +37,62 @@ class PendampingController extends Controller
     public function daftarPenerima()
     {
         $user = Auth::user();
-        $penerima = User::where('role', 'penerima')->get();
-
-        // Jika user adalah pendamping, tambahkan status pendampingan
+        
         if ($user->role === 'pendamping') {
             $pendampingProfile = $user->pendamping;
+            
+            // Ambil penerima yang didampingi oleh pendamping ini
+            $penerima = User::where('role', 'penerima')
+                ->whereHas('pendaftaran', function($query) use ($pendampingProfile) {
+                    $query->where('pendamping_id', $pendampingProfile->id)
+                          ->where('status', 'approved');
+                })
+                ->with(['pendaftaran' => function($query) use ($pendampingProfile) {
+                    $query->where('pendamping_id', $pendampingProfile->id)
+                          ->where('status', 'approved');
+                }])
+                ->get();
+
+            // Tambahkan status laporan untuk setiap penerima
             foreach ($penerima as $p) {
-                // Ambil laporan terbaru untuk penerima ini dari pendamping yang sedang login
                 $latestReport = LaporanPendampingan::where('pendamping_id', $pendampingProfile->id)
                     ->where('penerima_id', $p->id)
-                    ->latest('tanggal') // Urutkan berdasarkan tanggal terbaru
+                    ->latest('tanggal')
                     ->first();
 
                 $p->report_status = $latestReport ? $latestReport->status : null;
             }
+
+            // Data statistik pendamping
+            $totalPenerima = $penerima->count();
+            $penerimaSelesai = $penerima->filter(function($p) {
+                return $p->report_status === 'Selesai';
+            })->count();
+            $penerimaProses = $penerima->filter(function($p) {
+                return $p->report_status === 'Proses';
+            })->count();
+            $penerimaBelumDidampingi = $penerima->filter(function($p) {
+                return is_null($p->report_status);
+            })->count();
+
+        } else {
+            // Jika admin, tampilkan semua penerima
+            $penerima = User::where('role', 'penerima')->get();
+            $totalPenerima = $penerima->count();
+            $penerimaSelesai = 0;
+            $penerimaProses = 0;
+            $penerimaBelumDidampingi = 0;
+            $pendampingProfile = null;
         }
 
         return view('pendamping.index', [
             'penerima' => $penerima,
-            'title' => 'Daftar Penerima Bantuan',
+            'pendampingProfile' => $pendampingProfile,
+            'totalPenerima' => $totalPenerima,
+            'penerimaSelesai' => $penerimaSelesai,
+            'penerimaProses' => $penerimaProses,
+            'penerimaBelumDidampingi' => $penerimaBelumDidampingi,
+            'title' => 'Dashboard Pendamping',
             'menuPenerima' => 'active'
         ]);
     }
