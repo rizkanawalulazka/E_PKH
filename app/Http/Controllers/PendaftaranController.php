@@ -46,6 +46,7 @@ class PendaftaranController extends Controller
         try {
             $validatedData = $request->validate([
                 'nik' => 'required|string|size:16|unique:pendaftaran,nik',
+                'no_kk' => 'required|digits:16',
                 'nama' => 'required|string|max:255',
                 'tempat_lahir' => 'required|string|max:255',
                 'tanggal_lahir' => 'required|date|before:today',
@@ -54,10 +55,14 @@ class PendaftaranController extends Controller
                 'komponen' => 'required|array|min:1',
                 'komponen.*' => 'in:kesehatan,pendidikan,kesejahteraan_sosial',
                 'kartu_keluarga' => 'required|file|image|mimes:jpeg,png,jpg|max:2048'
+                'foto_rumah' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+
             ], [
                 'nik.required' => 'NIK wajib diisi',
                 'nik.size' => 'NIK harus tepat 16 digit',
                 'nik.unique' => 'NIK sudah terdaftar sebelumnya',
+                'no_kk.required' => 'No. Kartu Keluarga wajib diisi',
+                'no_kk.digits' => 'No. Kartu Keluarga harus 16 digit',
                 'nama.required' => 'Nama lengkap wajib diisi',
                 'tempat_lahir.required' => 'Tempat lahir wajib diisi',
                 'tanggal_lahir.required' => 'Tanggal lahir wajib diisi',
@@ -72,7 +77,11 @@ class PendaftaranController extends Controller
                 'kartu_keluarga.required' => 'Kartu keluarga wajib diunggah',
                 'kartu_keluarga.image' => 'File harus berupa gambar',
                 'kartu_keluarga.mimes' => 'Format file harus JPG, JPEG, atau PNG',
-                'kartu_keluarga.max' => 'Ukuran file maksimal 2MB'
+                'kartu_keluarga.max' => 'Ukuran file maksimal 2MB',
+                'foto_rumah.required' => 'Foto rumah wajib diunggah',
+                'foto_rumah.image' => 'File harus berupa gambar',
+                'foto_rumah.mimes' => 'Format gambar harus JPG, JPEG, atau PNG',
+                'foto_rumah.max' => 'Ukuran file maksimal 2MB',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Validation Error:', [
@@ -109,6 +118,7 @@ class PendaftaranController extends Controller
             $pendaftaran = Pendaftaran::create([
                 'user_id' => auth()->id(),
                 'nik' => $validatedData['nik'],
+                'no_kk' => $request->no_kk,
                 'nama' => $validatedData['nama'],
                 'tempat_lahir' => $validatedData['tempat_lahir'],
                 'tanggal_lahir' => $validatedData['tanggal_lahir'],
@@ -116,6 +126,7 @@ class PendaftaranController extends Controller
                 'no_hp' => $validatedData['no_hp'],
                 'komponen' => $validatedData['komponen'],
                 'kartu_keluarga' => $kartuKeluargaPath,
+                 'foto_rumah' => $fotoRumahPath,
                 'status' => 'pending'
             ]);
 

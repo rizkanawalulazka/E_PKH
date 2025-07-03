@@ -9,12 +9,12 @@ class Pendaftaran extends Model
 {
     use HasFactory;
 
-    protected $table = 'pendaftaran'; // pastikan nama tabel sesuai di database
+    protected $table = 'pendaftaran';
     
     protected $fillable = [
         'user_id',
-        'pendamping_id', // TAMBAHKAN INI
         'nik',
+        'no_kk',
         'nama',
         'tempat_lahir',
         'tanggal_lahir',
@@ -22,27 +22,20 @@ class Pendaftaran extends Model
         'no_hp',
         'komponen',
         'kartu_keluarga',
+        'foto_rumah',
         'status',
         'catatan_admin',
-        'approved_at',
-        'rejected_at'
+        'approved_at'
     ];
 
     protected $casts = [
-        'komponen' => 'array', // Penting untuk menyimpan array
+        'komponen' => 'array',
         'tanggal_lahir' => 'date',
         'approved_at' => 'datetime'
     ];
 
-    // Relasi dengan user
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    // Relasi ke Pendamping - TAMBAHKAN INI
-    public function pendamping()
-    {
-        return $this->belongsTo(Pendamping::class);
     }
 }

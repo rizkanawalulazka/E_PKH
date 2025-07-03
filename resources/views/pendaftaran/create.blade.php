@@ -34,12 +34,19 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="nama" class="text-dark">Nama Lengkap <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('nama') is-invalid @enderror" 
-                                           id="nama" name="nama" value="{{ old('nama') }}" 
-                                           placeholder="Masukkan nama lengkap" required>
+                                    <label for="no_kk" class="text-dark">No. Kartu Keluarga <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('no_kk') is-invalid @enderror" 
+                                           id="no_kk" name="no_kk" value="{{ old('no_kk') }}" 
+                                           placeholder="Masukkan No. KK 16 digit" maxlength="16" required>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nama" class="text-dark">Nama Lengkap <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('nama') is-invalid @enderror" 
+                                   id="nama" name="nama" value="{{ old('nama') }}" 
+                                   placeholder="Masukkan nama lengkap" required>
                         </div>
 
                         <div class="row">
@@ -102,10 +109,23 @@
                             </div>
                         </div>
 
-                        <div class="form-group mt-4">
-                            <label for="kartu_keluarga" class="text-dark">Unggah Gambar Kartu Keluarga <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control-file @error('kartu_keluarga') is-invalid @enderror" id="kartu_keluarga" name="kartu_keluarga" accept="image/*" required>
-                            <small class="form-text text-muted">Format gambar: JPG, JPEG, PNG. Maksimal 2MB.</small>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mt-4">
+                                    <label for="kartu_keluarga" class="text-dark">Unggah Gambar Kartu Keluarga <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control-file @error('kartu_keluarga') is-invalid @enderror" 
+                                           id="kartu_keluarga" name="kartu_keluarga" accept="image/*" required>
+                                    <small class="form-text text-muted">Format gambar: JPG, JPEG, PNG. Maksimal 2MB.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mt-4">
+                                    <label for="foto_rumah" class="text-dark">Unggah Foto Rumah <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control-file @error('foto_rumah') is-invalid @enderror" 
+                                           id="foto_rumah" name="foto_rumah" accept="image/*" required>
+                                    <small class="form-text text-muted">Format gambar: JPG, JPEG, PNG. Maksimal 2MB.</small>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mt-4">
@@ -195,6 +215,18 @@ $(document).ready(function() {
             isValid = false;
         }
 
+        // Validasi No. KK
+        const noKk = $('#no_kk').val().trim();
+        if (noKk === '') {
+            $('#no_kk').addClass('is-invalid');
+            errorMessage += 'No. Kartu Keluarga wajib diisi.<br>';
+            isValid = false;
+        } else if (noKk.length !== 16 || !/^\d+$/.test(noKk)) {
+            $('#no_kk').addClass('is-invalid');
+            errorMessage += 'No. Kartu Keluarga harus 16 digit angka.<br>';
+            isValid = false;
+        }
+
         // Validasi nama
         const nama = $('#nama').val().trim();
         if (nama === '') {
@@ -259,23 +291,45 @@ $(document).ready(function() {
         }
 
         // Validasi file kartu keluarga
-        const fileInput = $('#kartu_keluarga')[0];
-        if (!fileInput.files.length) {
+        const fileKK = $('#kartu_keluarga')[0];
+        if (!fileKK.files.length) {
             $('#kartu_keluarga').addClass('is-invalid');
             errorMessage += 'Kartu keluarga wajib diunggah.<br>';
             isValid = false;
         } else {
-            const file = fileInput.files[0];
+            const file = fileKK.files[0];
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             const maxSize = 2048 * 1024; // 2MB in bytes
 
             if (!allowedTypes.includes(file.type)) {
                 $('#kartu_keluarga').addClass('is-invalid');
-                errorMessage += 'Format file harus JPG, JPEG, atau PNG.<br>';
+                errorMessage += 'Format file Kartu Keluarga harus JPG, JPEG, atau PNG.<br>';
                 isValid = false;
             } else if (file.size > maxSize) {
                 $('#kartu_keluarga').addClass('is-invalid');
-                errorMessage += 'Ukuran file maksimal 2MB.<br>';
+                errorMessage += 'Ukuran file Kartu Keluarga maksimal 2MB.<br>';
+                isValid = false;
+            }
+        }
+
+        // Validasi file foto rumah
+        const fileFotoRumah = $('#foto_rumah')[0];
+        if (!fileFotoRumah.files.length) {
+            $('#foto_rumah').addClass('is-invalid');
+            errorMessage += 'Foto rumah wajib diunggah.<br>';
+            isValid = false;
+        } else {
+            const file = fileFotoRumah.files[0];
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            const maxSize = 2048 * 1024; // 2MB in bytes
+
+            if (!allowedTypes.includes(file.type)) {
+                $('#foto_rumah').addClass('is-invalid');
+                errorMessage += 'Format file Foto Rumah harus JPG, JPEG, atau PNG.<br>';
+                isValid = false;
+            } else if (file.size > maxSize) {
+                $('#foto_rumah').addClass('is-invalid');
+                errorMessage += 'Ukuran file Foto Rumah maksimal 2MB.<br>';
                 isValid = false;
             }
         }
@@ -443,6 +497,10 @@ $(document).ready(function() {
 
     // Real-time validation
     $('#nik').on('input', function() {
+        $(this).val($(this).val().replace(/\D/g, '').substring(0, 16));
+    });
+
+    $('#no_kk').on('input', function() {
         $(this).val($(this).val().replace(/\D/g, '').substring(0, 16));
     });
 
