@@ -1,202 +1,192 @@
 @extends('layouts.app', ['pendampingRandom' => $pendampingRandom ?? null])
 
-@section('title', 'Dashboard') {{-- Ini untuk <title> --}}
-@section('page-title', 'Dashboard') {{-- Ini untuk judul halaman di body (opsional) --}}
+@section('title', 'Dashboard')
 
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-tachometer-alt mr-2"></i>
-            @yield('page-title')
-        </h1>
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-blue-100 rounded-lg">
+                <i class="fas fa-tachometer-alt text-blue-600 text-xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+        </div>
         @if(auth()->user()->role === 'penerima')
-        <a href="/pendaftaran/create" class="d-none d-sm-inline-block btn btn-primary shadow-sm">
-            <i class="fas fa-plus fa-sm text-white-50"></i> Daftar PKH Baru
+        <a href="/pendaftaran/create" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+            <i class="fas fa-plus mr-2"></i>
+            Daftar PKH Baru
         </a>
         @endif
     </div>
 
-    <!-- Content Row -->
-    <div class="row">
-        <!-- Total Bantuan Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Bantuan (2024)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rp306.500.000</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Bantuan -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Total Bantuan (2024)</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">Rp306.500.000</p>
+                </div>
+                <div class="p-3 bg-blue-100 rounded-full">
+                    <i class="fas fa-calendar text-blue-600 text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Rata-rata Bantuan Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Rata-rata Bantuan (Bulanan)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rp25.541.667</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+        <!-- Rata-rata Bantuan -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Rata-rata Bantuan (Bulanan)</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">Rp25.541.667</p>
+                </div>
+                <div class="p-3 bg-green-100 rounded-full">
+                    <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Jumlah Penerima Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Jumlah Penerima</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">150</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+        <!-- Jumlah Penerima -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Jumlah Penerima</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">150</p>
+                </div>
+                <div class="p-3 bg-cyan-100 rounded-full">
+                    <i class="fas fa-users text-cyan-600 text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Pending Requests Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Pengajuan Pending</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-comments fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+        <!-- Pengajuan Pending -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Pengajuan Pending</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">18</p>
+                </div>
+                <div class="p-3 bg-yellow-100 rounded-full">
+                    <i class="fas fa-comments text-yellow-600 text-xl"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Content Row -->
-    <div class="row">
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Bar Chart -->
-        <div class="col-xl-12">
-            <div class="card shadow mb-4">
-                <!-- Card Header -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Data Bantuan Bulanan (2024)</h6>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="chart-bar">
-                        <canvas id="bantuanBarChart"></canvas>
-                    </div>
-                    <hr>
-                    <div class="text-center small mt-4">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> Total Bantuan per Bulan
-                        </span>
-                    </div>
-                </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold text-gray-900">Data Bantuan Bulanan (2024)</h2>
+            </div>
+            <div class="h-80">
+                <canvas id="bantuanBarChart"></canvas>
             </div>
         </div>
-    </div>
 
-    <!-- Content Row -->
-    <div class="row">
         <!-- Pie Chart -->
-        <div class="col-xl-12">
-            <div class="card shadow mb-4">
-                <!-- Card Header -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Distribusi Komponen PKH</h6>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold text-gray-900">Distribusi Komponen PKH</h2>
+            </div>
+            <div class="h-80">
+                <canvas id="pkhPieChart"></canvas>
+            </div>
+            <div class="flex items-center justify-center space-x-6 mt-4">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                    <span class="text-sm text-gray-600">Kesehatan</span>
                 </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="pkhPieChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> Kesehatan
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Pendidikan
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-info"></i> Kesejahteraan Sosial
-                        </span>
-                    </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                    <span class="text-sm text-gray-600">Pendidikan</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-cyan-500 rounded-full mr-2"></div>
+                    <span class="text-sm text-gray-600">Kesejahteraan Sosial</span>
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 @section('scripts')
-    <!-- Page level plugins -->
-    <script src="{{ asset('sbadmin2/vendor/chart.js/Chart.min.js') }}"></script>
-    
-    <!-- Page level custom scripts -->
-    <script src="{{ asset('sbadmin2/js/demo/chart-bar-bantuan.js') }}"></script>
-    <script>
-        // Pie Chart
-        var ctx = document.getElementById("pkhPieChart");
-        var pkhPieChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ["Kesehatan", "Pendidikan", "Kesejahteraan Sosial"],
-                datasets: [{
-                    data: [35, 45, 20], // Data dummy dalam persen
-                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
-                    hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
-                    hoverBorderColor: "rgba(234, 236, 244, 1)",
-                }],
-            },
-            options: {
-                maintainAspectRatio: false,
-                tooltips: {
-                    backgroundColor: "rgb(255,255,255)",
-                    bodyFontColor: "#858796",
-                    borderColor: '#dddfeb',
-                    borderWidth: 1,
-                    xPadding: 15,
-                    yPadding: 15,
-                    displayColors: false,
-                    caretPadding: 10,
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            var dataset = data.datasets[tooltipItem.datasetIndex];
-                            var total = dataset.data.reduce(function(previousValue, currentValue) {
-                                return previousValue + currentValue;
-                            });
-                            var currentValue = dataset.data[tooltipItem.index];
-                            var percentage = Math.round((currentValue/total) * 100);
-                            return data.labels[tooltipItem.index] + ': ' + percentage + '%';
-                        }
-                    }
-                },
+<script>
+    // Pie Chart
+    var ctx = document.getElementById("pkhPieChart");
+    var pkhPieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ["Kesehatan", "Pendidikan", "Kesejahteraan Sosial"],
+            datasets: [{
+                data: [35, 45, 20],
+                backgroundColor: ['#3B82F6', '#10B981', '#06B6D4'],
+                hoverBackgroundColor: ['#2563EB', '#059669', '#0891B2'],
+                borderWidth: 0,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
                 legend: {
                     display: false
                 },
-                cutoutPercentage: 80,
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + '%';
+                        }
+                    }
+                }
             },
-        });
-    </script>
+            cutout: '60%',
+        },
+    });
+
+    // Bar Chart
+    var ctx2 = document.getElementById("bantuanBarChart");
+    var bantuanBarChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+            datasets: [{
+                label: 'Bantuan (Juta Rupiah)',
+                data: [25, 30, 22, 28, 35, 20, 40, 32, 28, 25, 30, 35],
+                backgroundColor: '#3B82F6',
+                borderColor: '#2563EB',
+                borderWidth: 1,
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#F3F4F6'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+</script>
 @endsection
 
 

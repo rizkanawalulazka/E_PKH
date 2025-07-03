@@ -1,110 +1,184 @@
 @extends('layouts.app')
 
 @section('title', 'Daftar Pendaftaran PKH')
-@section('page-title', 'Daftar Pendaftaran PKH')
 
 @section('content')
-<div class="container-fluid">
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Data Pendaftaran PKH</h6>
-        </div>
-        <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>NIK</th>
-                            <th>Nama</th>
-                            <th>Tempat, Tanggal Lahir</th>
-                            <th>Alamat</th>
-                            <th>No. HP</th>
-                            <th>Komponen Bantuan</th>
-                            <th>Status</th>
-                            <th>Tanggal Daftar</th>
-                            @if(auth()->user() && auth()->user()->role === 'admin')
-                                <th>Aksi</th>
-                            @endif
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($pendaftaran as $key => $data)
-                        <tr>
-                            <td>{{ $key + 1 }}</td>
-                            <td>{{ $data->nik }}</td>
-                            <td>{{ $data->nama }}</td>
-                            <td>{{ $data->tempat_lahir }}, {{ \Carbon\Carbon::parse($data->tanggal_lahir)->format('d/m/Y') }}</td>
-                            <td>{{ $data->alamat }}</td>
-                            <td>{{ $data->no_hp }}</td>
-                            <td>
-                                @foreach($data->komponen as $komponen)
-                                    <span class="badge badge-info">
-                                        {{ str_replace('_', ' ', ucfirst($komponen)) }}
-                                    </span>
-                                @endforeach
-                            </td>
-                            <td>
-                                @if($data->status == 'pending')
-                                    <span class="badge badge-warning">Diproses</span>
-                                @elseif($data->status == 'approved')
-                                    <span class="badge badge-success">Disetujui</span>
-                                @else
-                                    <span class="badge badge-danger">Ditolak</span>
-                                @endif
-                            </td>
-                            <td>{{ $data->created_at->format('d/m/Y H:i') }}</td>
-                            @if(auth()->user() && auth()->user()->role === 'admin')
-                                <td>
-                                    <!-- Dropdown untuk edit status -->
-                                    <select class="form-control form-control-sm change-status" data-id="{{ $data->id }}" data-current-status="{{ $data->status }}">
-                                        <option value="">-- Ubah Status --</option>
-                                        <option value="pending" {{ $data->status == 'pending' ? 'disabled' : '' }}>Diproses</option>
-                                        <option value="approved" {{ $data->status == 'approved' ? 'disabled' : '' }}>Setujui</option>
-                                        <option value="rejected" {{ $data->status == 'rejected' ? 'disabled' : '' }}>Tolak</option>
-                                    </select>
-                                    
-                                    <!-- Tombol Quick Action untuk status pending -->
-                                    @if($data->status == 'pending')
-                                        <div class="mt-1">
-                                            <button type="button" class="btn btn-success btn-xs quick-approve" data-id="{{ $data->id }}">
-                                                <i class="fas fa-check"></i> Setujui
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-xs quick-reject" data-id="{{ $data->id }}">
-                                                <i class="fas fa-times"></i> Tolak
-                                            </button>
-                                        </div>
-                                    @endif
-                                </td>
-                            @endif
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-blue-100 rounded-lg">
+                <i class="fas fa-table text-blue-600 text-xl"></i>
             </div>
+            <h1 class="text-2xl font-bold text-gray-900">Daftar Pendaftaran PKH</h1>
+        </div>
+        @if(auth()->user()->role == 'penerima')
+        <a href="/pendaftaran/create" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+            <i class="fas fa-plus mr-2"></i>
+            Daftar Baru
+        </a>
+        @endif
+    </div>
+
+    <!-- Filters -->
+    @if(auth()->user()->role == 'admin')
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center space-x-2">
+                <label class="text-sm font-medium text-gray-700">Filter Status:</label>
+                <select id="statusFilter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Semua Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Disetujui</option>
+                    <option value="rejected">Ditolak</option>
+                </select>
+            </div>
+            <div class="flex items-center space-x-2">
+                <label class="text-sm font-medium text-gray-700">Filter Komponen:</label>
+                <select id="komponenFilter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Semua Komponen</option>
+                    <option value="kesehatan">Kesehatan</option>
+                    <option value="pendidikan">Pendidikan</option>
+                    <option value="kesejahteraan_sosial">Kesejahteraan Sosial</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Data Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Data Pendaftaran</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full" id="dataTable">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIK</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alamat</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No HP</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Komponen</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Daftar</th>
+                        @if(auth()->user()->role == 'admin')
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        @endif
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($pendaftaran as $index => $p)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $index + 1 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $p->nik }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ $p->nama }}</div>
+                                    <div class="text-sm text-gray-500">{{ $p->tempat_lahir }}, {{ \Carbon\Carbon::parse($p->tanggal_lahir)->format('d M Y') }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            <div class="max-w-xs truncate">{{ $p->alamat }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $p->no_hp }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex flex-wrap gap-1">
+                                @if(is_array($p->komponen))
+                                    @foreach($p->komponen as $komponen)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                            @if($komponen == 'kesehatan') bg-red-100 text-red-800
+                                            @elseif($komponen == 'pendidikan') bg-blue-100 text-blue-800
+                                            @else bg-green-100 text-green-800
+                                            @endif">
+                                            {{ ucfirst(str_replace('_', ' ', $komponen)) }}
+                                        </span>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($p->status == 'pending')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    Pending
+                                </span>
+                            @elseif($p->status == 'approved')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check mr-1"></i>
+                                    Disetujui
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-times mr-1"></i>
+                                    Ditolak
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ \Carbon\Carbon::parse($p->created_at)->format('d M Y') }}
+                        </td>
+                        @if(auth()->user()->role == 'admin')
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            @if($p->status == 'pending')
+                                <div class="flex space-x-2">
+                                    <button onclick="approveRegistration({{ $p->id }})" 
+                                            class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                        <i class="fas fa-check mr-1"></i>
+                                        Setujui
+                                    </button>
+                                    <button onclick="rejectRegistration({{ $p->id }})" 
+                                            class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        <i class="fas fa-times mr-1"></i>
+                                        Tolak
+                                    </button>
+                                </div>
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                        @endif
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="9" class="px-6 py-8 text-center text-sm text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-inbox text-gray-300 text-4xl mb-3"></i>
+                                <p>Belum ada data pendaftaran</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <!-- Modal Konfirmasi -->
-<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Konfirmasi Perubahan Status</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
+<div id="confirmModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+        <div class="text-center">
+            <div id="modalIcon" class="p-4 rounded-full w-16 h-16 mx-auto mb-4">
+                <i id="modalIconClass" class="text-2xl"></i>
+            </div>
+            <h3 id="modalTitle" class="text-lg font-semibold text-gray-900 mb-2"></h3>
+            <p id="modalMessage" class="text-gray-600 mb-6"></p>
+            <div class="flex space-x-3">
+                <button id="cancelBtn" class="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                    Batal
                 </button>
-            </div>
-            <div class="modal-body">
-                <p id="confirmMessage"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary" id="confirmAction">Ya, Ubah</button>
+                <button id="confirmBtn" class="flex-1 py-2 px-4 rounded-lg transition-colors font-medium">
+                    Konfirmasi
+                </button>
             </div>
         </div>
     </div>
@@ -112,159 +186,125 @@
 @endsection
 
 @section('scripts')
-<!-- Page level plugins -->
-<script src="{{ asset('sbadmin2/vendor/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('sbadmin2/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-
 <script>
-    $(document).ready(function() {
-        $('#dataTable').DataTable({
-            "pageLength": 25,
-            "order": [[ 0, "asc" ]]
-        });
-        
-        var pendingAction = null;
-        
-        // Handle dropdown change
-        $('.change-status').on('change', function() {
-            var id = $(this).data('id');
-            var currentStatus = $(this).data('current-status');
-            var newStatus = $(this).val();
-            var selectElement = $(this);
-            
-            if (newStatus === '') {
-                return;
+$(document).ready(function() {
+    // Initialize DataTable
+    $('#dataTable').DataTable({
+        "responsive": true,
+        "order": [[ 0, "asc" ]],
+        "pageLength": 10,
+        "language": {
+            "search": "Cari:",
+            "lengthMenu": "Tampilkan _MENU_ data per halaman",
+            "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            "infoEmpty": "Tidak ada data yang ditampilkan",
+            "infoFiltered": "(difilter dari _MAX_ total data)",
+            "paginate": {
+                "first": "Pertama",
+                "last": "Terakhir",
+                "next": "Selanjutnya",
+                "previous": "Sebelumnya"
             }
-            
-            var statusText = {
-                'pending': 'Diproses',
-                'approved': 'Disetujui',
-                'rejected': 'Ditolak'
-            };
-            
-            pendingAction = {
-                id: id,
-                currentStatus: currentStatus,
-                newStatus: newStatus,
-                element: selectElement
-            };
-            
-            $('#confirmMessage').text('Ubah status dari "' + statusText[currentStatus] + '" menjadi "' + statusText[newStatus] + '"?');
-            $('#confirmModal').modal('show');
-        });
+        }
+    });
+
+    // Filter functionality
+    $('#statusFilter, #komponenFilter').on('change', function() {
+        var table = $('#dataTable').DataTable();
+        var statusFilter = $('#statusFilter').val();
+        var komponenFilter = $('#komponenFilter').val();
         
-        
-        // Handle quick approve
-        $('.quick-approve').on('click', function() {
-            var id = $(this).data('id');
-            
-            pendingAction = {
-                id: id,
-                currentStatus: 'pending',
-                newStatus: 'approved',
-                element: null
-            };
-            
-            $('#confirmMessage').text('Setujui pendaftaran ini?');
-            $('#confirmModal').modal('show');
-        });
-        
-        // Handle quick reject
-        $('.quick-reject').on('click', function() {
-            var id = $(this).data('id');
-            
-            pendingAction = {
-                id: id,
-                currentStatus: 'pending',
-                newStatus: 'rejected',
-                element: null
-            };
-            
-            $('#confirmMessage').text('Tolak pendaftaran ini?');
-            $('#confirmModal').modal('show');
-        });
-        
-        // Handle konfirmasi action
-        $('#confirmAction').on('click', function() {
-            if (pendingAction) {
-                updateStatus(pendingAction);
-                $('#confirmModal').modal('hide');
-            }
-        });
-        
-        // Handle modal close
-        $('#confirmModal').on('hidden.bs.modal', function () {
-            if (pendingAction && pendingAction.element) {
-                pendingAction.element.val('');
-            }
-            pendingAction = null;
-        });
-        
-        // Fungsi untuk update status
-        function updateStatus(actionData) {
+        table.columns(6).search(statusFilter).draw();
+        table.columns(5).search(komponenFilter).draw();
+    });
+
+    // Modal controls
+    $('#cancelBtn').on('click', function() {
+        $('#confirmModal').addClass('hidden');
+    });
+});
+
+function approveRegistration(id) {
+    showConfirmModal(
+        'Setujui Pendaftaran',
+        'Apakah Anda yakin ingin menyetujui pendaftaran ini?',
+        'approve',
+        function() {
             $.ajax({
-                url: '/admin/pendaftaran/' + actionData.id + '/update-status',
+                url: '/pendaftaran/' + id + '/approve',
                 method: 'POST',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    status: actionData.newStatus
-                },
-                beforeSend: function() {
-                    if (actionData.element) {
-                        actionData.element.prop('disabled', true);
-                    }
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
                     if (response.success) {
-                        // Tampilkan pesan sukses
-                        $('.card-body').prepend(
-                            '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
-                            'Status berhasil diubah!' +
-                            '<button type="button" class="close" data-dismiss="alert">' +
-                            '<span>&times;</span></button></div>'
-                        );
-                        
-                        // Refresh halaman setelah 1 detik
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
-                        
+                        showNotification('success', 'Pendaftaran berhasil disetujui');
+                        location.reload();
                     } else {
-                        alert('Gagal mengubah status: ' + response.message);
+                        showNotification('error', response.message || 'Terjadi kesalahan');
                     }
                 },
-                error: function(xhr) {
-                    console.error('Error:', xhr);
-                    alert('Terjadi kesalahan saat mengubah status');
-                },
-                complete: function() {
-                    if (actionData.element) {
-                        actionData.element.prop('disabled', false);
-                    }
+                error: function() {
+                    showNotification('error', 'Terjadi kesalahan sistem');
                 }
             });
         }
-    });
-</script>
-@endsection
+    );
+}
 
-@section('styles')
-<!-- Custom styles for this page -->
-<link href="{{ asset('sbadmin2/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-<style>
-    .change-status {
-        width: 140px;
-        font-size: 12px;
+function rejectRegistration(id) {
+    showConfirmModal(
+        'Tolak Pendaftaran',
+        'Apakah Anda yakin ingin menolak pendaftaran ini?',
+        'reject',
+        function() {
+            $.ajax({
+                url: '/pendaftaran/' + id + '/reject',
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showNotification('success', 'Pendaftaran berhasil ditolak');
+                        location.reload();
+                    } else {
+                        showNotification('error', response.message || 'Terjadi kesalahan');
+                    }
+                },
+                error: function() {
+                    showNotification('error', 'Terjadi kesalahan sistem');
+                }
+            });
+        }
+    );
+}
+
+function showConfirmModal(title, message, type, callback) {
+    $('#modalTitle').text(title);
+    $('#modalMessage').text(message);
+    
+    if (type === 'approve') {
+        $('#modalIcon').removeClass().addClass('p-4 bg-green-100 rounded-full w-16 h-16 mx-auto mb-4');
+        $('#modalIconClass').removeClass().addClass('fas fa-check text-green-600 text-2xl');
+        $('#confirmBtn').removeClass().addClass('flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium');
+    } else {
+        $('#modalIcon').removeClass().addClass('p-4 bg-red-100 rounded-full w-16 h-16 mx-auto mb-4');
+        $('#modalIconClass').removeClass().addClass('fas fa-times text-red-600 text-2xl');
+        $('#confirmBtn').removeClass().addClass('flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium');
     }
     
-    .btn-xs {
-        padding: 0.2rem 0.4rem;
-        font-size: 0.75rem;
-        line-height: 1.2;
-    }
+    $('#confirmBtn').off('click').on('click', function() {
+        $('#confirmModal').addClass('hidden');
+        callback();
+    });
     
-    .quick-approve, .quick-reject {
-        margin-right: 2px;
-    }
-</style>
+    $('#confirmModal').removeClass('hidden');
+}
+
+function showNotification(type, message) {
+    // You can implement toast notifications here
+    alert(message);
+}
+</script>
 @endsection

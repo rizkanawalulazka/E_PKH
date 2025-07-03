@@ -1,183 +1,172 @@
 @extends('layouts.app')
 
 @section('title', 'Daftar PKH')
-@section('page-title', 'Daftar PKH')
 
 @section('content')
-<style>
-    #formPendaftaran > .form-group > label,
-    #formPendaftaran .row .form-group > label,
-    #formPendaftaran .form-group.mt-4 > label {
-        color: #000 !important;
-    }
-</style>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Form Pendaftaran PKH</h6>
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex items-center space-x-3">
+        <div class="p-2 bg-blue-100 rounded-lg">
+            <i class="fas fa-user-plus text-blue-600 text-xl"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">Form Pendaftaran PKH</h1>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="p-6">
+            <div id="alert-container"></div>
+
+            <form id="formPendaftaran" action="{{ route('pendaftaran.pkh.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                @csrf
+                
+                <!-- Data Identitas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="nik" class="block text-sm font-medium text-gray-700 mb-2">NIK <span class="text-red-500">*</span></label>
+                        <input type="text" id="nik" name="nik" maxlength="16" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Masukkan NIK 16 digit">
+                    </div>
+                    <div>
+                        <label for="no_kk" class="block text-sm font-medium text-gray-700 mb-2">No. Kartu Keluarga <span class="text-red-500">*</span></label>
+                        <input type="text" id="no_kk" name="no_kk" maxlength="16" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Masukkan No. KK 16 digit">
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div id="alert-container"></div>
 
-                    <form id="formPendaftaran" action="{{ route('pendaftaran.pkh.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="nik" class="text-dark">NIK <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('nik') is-invalid @enderror" 
-                                           id="nik" name="nik" value="{{ old('nik') }}" 
-                                           placeholder="Masukkan NIK 16 digit" maxlength="16" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="no_kk" class="text-dark">No. Kartu Keluarga <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('no_kk') is-invalid @enderror" 
-                                           id="no_kk" name="no_kk" value="{{ old('no_kk') }}" 
-                                           placeholder="Masukkan No. KK 16 digit" maxlength="16" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="nama" class="text-dark">Nama Lengkap <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('nama') is-invalid @enderror" 
-                                   id="nama" name="nama" value="{{ old('nama') }}" 
-                                   placeholder="Masukkan nama lengkap" required>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="tempat_lahir" class="text-dark">Tempat Lahir <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('tempat_lahir') is-invalid @enderror" 
-                                           id="tempat_lahir" name="tempat_lahir" value="{{ old('tempat_lahir') }}" 
-                                           placeholder="Masukkan tempat lahir" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="tanggal_lahir" class="text-dark">Tanggal Lahir <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control @error('tanggal_lahir') is-invalid @enderror" 
-                                           id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="alamat" class="text-dark">Alamat Lengkap <span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('alamat') is-invalid @enderror" 
-                                      id="alamat" name="alamat" rows="3" 
-                                      placeholder="Masukkan alamat lengkap" required>{{ old('alamat') }}</textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="no_hp" class="text-dark">Nomor HP <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('no_hp') is-invalid @enderror" 
-                                   id="no_hp" name="no_hp" value="{{ old('no_hp') }}" 
-                                   placeholder="Masukkan nomor HP" maxlength="15" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="text-dark">Komponen Bantuan <span class="text-danger">*</span></label>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" 
-                                       id="komponen_kesehatan" name="komponen[]" 
-                                       value="kesehatan" {{ in_array('kesehatan', old('komponen', [])) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="komponen_kesehatan">
-                                    Kesehatan (Ibu Hamil/Balita/Lansia)
-                                </label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" 
-                                       id="komponen_pendidikan" name="komponen[]" 
-                                       value="pendidikan" {{ in_array('pendidikan', old('komponen', [])) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="komponen_pendidikan">
-                                    Pendidikan (Anak Usia Sekolah)
-                                </label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" 
-                                       id="komponen_kesejahteraan" name="komponen[]" 
-                                       value="kesejahteraan_sosial" {{ in_array('kesejahteraan_sosial', old('komponen', [])) ? 'checked' : '' }}>
-                                <label class="custom-control-label" for="komponen_kesejahteraan">
-                                    Kesejahteraan Sosial (Disabilitas Berat)
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mt-4">
-                                    <label for="kartu_keluarga" class="text-dark">Unggah Gambar Kartu Keluarga <span class="text-danger">*</span></label>
-                                    <input type="file" class="form-control-file @error('kartu_keluarga') is-invalid @enderror" 
-                                           id="kartu_keluarga" name="kartu_keluarga" accept="image/*" required>
-                                    <small class="form-text text-muted">Format gambar: JPG, JPEG, PNG. Maksimal 2MB.</small>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mt-4">
-                                    <label for="foto_rumah" class="text-dark">Unggah Foto Rumah <span class="text-danger">*</span></label>
-                                    <input type="file" class="form-control-file @error('foto_rumah') is-invalid @enderror" 
-                                           id="foto_rumah" name="foto_rumah" accept="image/*" required>
-                                    <small class="form-text text-muted">Format gambar: JPG, JPEG, PNG. Maksimal 2MB.</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary" id="btnSubmit">
-                                <span id="btnText">
-                                    <i class="fas fa-paper-plane mr-2"></i>Kirim Pendaftaran
-                                </span>
-                                <span id="btnLoader" style="display: none;">
-                                    <i class="fas fa-spinner fa-spin mr-2"></i>Mengirim Data...
-                                </span>
-                            </button>
-                            <a href="{{ route('dashboard') }}" class="btn btn-secondary" id="btnKembali">
-                                <i class="fas fa-arrow-left mr-2"></i>Kembali
-                            </a>
-                        </div>
-
-                        <!-- Loading Progress Bar -->
-                        <div id="loadingProgress" class="mt-3" style="display: none;">
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                     role="progressbar" style="width: 0%" id="progressBar">
-                                    <span id="progressText">0%</span>
-                                </div>
-                            </div>
-                            <small class="text-muted">Sedang mengunggah dan memproses data...</small>
-                        </div>
-                    </form>
+                <div>
+                    <label for="nama" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
+                    <input type="text" id="nama" name="nama" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Masukkan nama lengkap">
                 </div>
-            </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="tempat_lahir" class="block text-sm font-medium text-gray-700 mb-2">Tempat Lahir <span class="text-red-500">*</span></label>
+                        <input type="text" id="tempat_lahir" name="tempat_lahir" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Masukkan tempat lahir">
+                    </div>
+                    <div>
+                        <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir <span class="text-red-500">*</span></label>
+                        <input type="date" id="tanggal_lahir" name="tanggal_lahir" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="alamat" class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap <span class="text-red-500">*</span></label>
+                    <textarea id="alamat" name="alamat" rows="3" required
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Masukkan alamat lengkap"></textarea>
+                </div>
+
+                <div>
+                    <label for="no_hp" class="block text-sm font-medium text-gray-700 mb-2">Nomor HP <span class="text-red-500">*</span></label>
+                    <input type="text" id="no_hp" name="no_hp" maxlength="15" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Masukkan nomor HP">
+                </div>
+
+                <!-- Komponen Bantuan -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-4">Komponen Bantuan <span class="text-red-500">*</span></label>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="komponen_kesehatan" name="komponen[]" value="kesehatan"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="komponen_kesehatan" class="ml-2 block text-sm text-gray-700">
+                                Kesehatan (Ibu Hamil/Balita/Lansia)
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="komponen_pendidikan" name="komponen[]" value="pendidikan"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="komponen_pendidikan" class="ml-2 block text-sm text-gray-700">
+                                Pendidikan (Anak Usia Sekolah)
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="komponen_kesejahteraan" name="komponen[]" value="kesejahteraan_sosial"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="komponen_kesejahteraan" class="ml-2 block text-sm text-gray-700">
+                                Kesejahteraan Sosial (Disabilitas Berat)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Files -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="kartu_keluarga" class="block text-sm font-medium text-gray-700 mb-2">Kartu Keluarga <span class="text-red-500">*</span></label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                            <input type="file" id="kartu_keluarga" name="kartu_keluarga" accept="image/*" required class="hidden">
+                            <i class="fas fa-upload text-gray-400 text-2xl mb-2"></i>
+                            <p class="text-gray-600">Klik untuk upload Kartu Keluarga</p>
+                            <p class="text-xs text-gray-500 mt-1">JPG, JPEG, PNG. Max 2MB</p>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="foto_rumah" class="block text-sm font-medium text-gray-700 mb-2">Foto Rumah <span class="text-red-500">*</span></label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                            <input type="file" id="foto_rumah" name="foto_rumah" accept="image/*" required class="hidden">
+                            <i class="fas fa-upload text-gray-400 text-2xl mb-2"></i>
+                            <p class="text-gray-600">Klik untuk upload Foto Rumah</p>
+                            <p class="text-xs text-gray-500 mt-1">JPG, JPEG, PNG. Max 2MB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="loadingProgress" class="hidden">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2">Sedang mengunggah dan memproses data...</p>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex space-x-4">
+                    <button type="submit" id="btnSubmit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        <span id="btnText">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Kirim Pendaftaran
+                        </span>
+                        <span id="btnLoader" class="hidden">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>
+                            Mengirim Data...
+                        </span>
+                    </button>
+                    <a href="{{ route('dashboard') }}" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Kembali
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="successModalLabel">Pendaftaran Berhasil</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+<div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+        <div class="text-center">
+            <div class="p-4 bg-green-100 rounded-full w-16 h-16 mx-auto mb-4">
+                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
             </div>
-            <div class="modal-body">
-                <div class="text-center">
-                    <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
-                    <p id="successMessage"></p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <a href="{{ route('dashboard') }}" class="btn btn-secondary">Kembali ke Dashboard</a>
-                <a href="{{ route('pendaftaran.pkh.index') }}" class="btn btn-primary">Lihat Data Pendaftaran</a>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Pendaftaran Berhasil</h3>
+            <p id="successMessage" class="text-gray-600 mb-6"></p>
+            <div class="flex space-x-3">
+                <a href="{{ route('dashboard') }}" class="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors text-center">
+                    Kembali
+                </a>
+                <a href="{{ route('pendaftaran.pkh.index') }}" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center">
+                    Lihat Data
+                </a>
             </div>
         </div>
     </div>
@@ -187,180 +176,38 @@
 @section('scripts')
 <script>
 $(document).ready(function() {
-    // Setup CSRF token untuk semua AJAX request
+    // Setup CSRF token
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 
-    // Validasi form sebelum submit
-    function validateForm() {
-        let isValid = true;
-        let errorMessage = '';
-
-        // Reset previous validation states
-        $('.form-control, .form-control-file').removeClass('is-invalid');
-        $('#alert-container').empty();
-
-        // Validasi NIK
-        const nik = $('#nik').val().trim();
-        if (nik === '') {
-            $('#nik').addClass('is-invalid');
-            errorMessage += 'NIK wajib diisi.<br>';
-            isValid = false;
-        } else if (nik.length !== 16 || !/^\d+$/.test(nik)) {
-            $('#nik').addClass('is-invalid');
-            errorMessage += 'NIK harus 16 digit angka.<br>';
-            isValid = false;
+    // File upload handlers
+    $('input[type="file"]').on('change', function() {
+        const file = this.files[0];
+        const parent = $(this).parent();
+        
+        if (file) {
+            parent.find('p').first().text(file.name);
+            parent.removeClass('border-gray-300').addClass('border-blue-500 bg-blue-50');
         }
+    });
 
-        // Validasi No. KK
-        const noKk = $('#no_kk').val().trim();
-        if (noKk === '') {
-            $('#no_kk').addClass('is-invalid');
-            errorMessage += 'No. Kartu Keluarga wajib diisi.<br>';
-            isValid = false;
-        } else if (noKk.length !== 16 || !/^\d+$/.test(noKk)) {
-            $('#no_kk').addClass('is-invalid');
-            errorMessage += 'No. Kartu Keluarga harus 16 digit angka.<br>';
-            isValid = false;
-        }
+    // Click handlers for upload areas
+    $('.border-dashed').on('click', function() {
+        $(this).find('input[type="file"]').click();
+    });
 
-        // Validasi nama
-        const nama = $('#nama').val().trim();
-        if (nama === '') {
-            $('#nama').addClass('is-invalid');
-            errorMessage += 'Nama lengkap wajib diisi.<br>';
-            isValid = false;
-        }
-
-        // Validasi tempat lahir
-        const tempatLahir = $('#tempat_lahir').val().trim();
-        if (tempatLahir === '') {
-            $('#tempat_lahir').addClass('is-invalid');
-            errorMessage += 'Tempat lahir wajib diisi.<br>';
-            isValid = false;
-        }
-
-        // Validasi tanggal lahir
-        const tanggalLahir = $('#tanggal_lahir').val();
-        if (tanggalLahir === '') {
-            $('#tanggal_lahir').addClass('is-invalid');
-            errorMessage += 'Tanggal lahir wajib diisi.<br>';
-            isValid = false;
-        } else {
-            const today = new Date();
-            const birthDate = new Date(tanggalLahir);
-            if (birthDate >= today) {
-                $('#tanggal_lahir').addClass('is-invalid');
-                errorMessage += 'Tanggal lahir tidak valid.<br>';
-                isValid = false;
-            }
-        }
-
-        // Validasi alamat
-        const alamat = $('#alamat').val().trim();
-        if (alamat === '') {
-            $('#alamat').addClass('is-invalid');
-            errorMessage += 'Alamat lengkap wajib diisi.<br>';
-            isValid = false;
-        } else if (alamat.length < 10) {
-            $('#alamat').addClass('is-invalid');
-            errorMessage += 'Alamat terlalu pendek (minimal 10 karakter).<br>';
-            isValid = false;
-        }
-
-        // Validasi nomor HP
-        const noHp = $('#no_hp').val().trim();
-        if (noHp === '') {
-            $('#no_hp').addClass('is-invalid');
-            errorMessage += 'Nomor HP wajib diisi.<br>';
-            isValid = false;
-        } else if (noHp.length < 10 || noHp.length > 15 || !/^\d+$/.test(noHp)) {
-            $('#no_hp').addClass('is-invalid');
-            errorMessage += 'Nomor HP harus 10-15 digit angka.<br>';
-            isValid = false;
-        }
-
-        // Validasi komponen bantuan
-        const komponenChecked = $('input[name="komponen[]"]:checked').length;
-        if (komponenChecked === 0) {
-            errorMessage += 'Pilih minimal satu komponen bantuan.<br>';
-            isValid = false;
-        }
-
-        // Validasi file kartu keluarga
-        const fileKK = $('#kartu_keluarga')[0];
-        if (!fileKK.files.length) {
-            $('#kartu_keluarga').addClass('is-invalid');
-            errorMessage += 'Kartu keluarga wajib diunggah.<br>';
-            isValid = false;
-        } else {
-            const file = fileKK.files[0];
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-            const maxSize = 2048 * 1024; // 2MB in bytes
-
-            if (!allowedTypes.includes(file.type)) {
-                $('#kartu_keluarga').addClass('is-invalid');
-                errorMessage += 'Format file Kartu Keluarga harus JPG, JPEG, atau PNG.<br>';
-                isValid = false;
-            } else if (file.size > maxSize) {
-                $('#kartu_keluarga').addClass('is-invalid');
-                errorMessage += 'Ukuran file Kartu Keluarga maksimal 2MB.<br>';
-                isValid = false;
-            }
-        }
-
-        // Validasi file foto rumah
-        const fileFotoRumah = $('#foto_rumah')[0];
-        if (!fileFotoRumah.files.length) {
-            $('#foto_rumah').addClass('is-invalid');
-            errorMessage += 'Foto rumah wajib diunggah.<br>';
-            isValid = false;
-        } else {
-            const file = fileFotoRumah.files[0];
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-            const maxSize = 2048 * 1024; // 2MB in bytes
-
-            if (!allowedTypes.includes(file.type)) {
-                $('#foto_rumah').addClass('is-invalid');
-                errorMessage += 'Format file Foto Rumah harus JPG, JPEG, atau PNG.<br>';
-                isValid = false;
-            } else if (file.size > maxSize) {
-                $('#foto_rumah').addClass('is-invalid');
-                errorMessage += 'Ukuran file Foto Rumah maksimal 2MB.<br>';
-                isValid = false;
-            }
-        }
-
-        // Tampilkan error jika ada
-        if (!isValid) {
-            $('#alert-container').html(
-                '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                '<strong>Perhatian!</strong><br>' + errorMessage +
-                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                '<span aria-hidden="true">&times;</span></button></div>'
-            );
-            $('html, body').animate({scrollTop: 0}, 500);
-        }
-
-        return isValid;
-    }
-
+    // Form validation and submission
     $('#formPendaftaran').on('submit', function(e) {
         e.preventDefault();
-
-        // Validasi form terlebih dahulu
+        
         if (!validateForm()) {
             return false;
         }
 
-        // Ambil data form SEBELUM field di-disable!
-        var form = $(this)[0];
-        var formData = new FormData(form);
-
-        // Baru setelah itu, disable tombol/form
+        const formData = new FormData(this);
         showLoading();
 
         $.ajax({
@@ -369,143 +216,149 @@ $(document).ready(function() {
             data: formData,
             processData: false,
             contentType: false,
-            timeout: 30000, // 30 seconds timeout
+            timeout: 30000,
             xhr: function() {
-                var xhr = new window.XMLHttpRequest();
-                
-                // Upload progress
+                const xhr = new window.XMLHttpRequest();
                 xhr.upload.addEventListener("progress", function(evt) {
                     if (evt.lengthComputable) {
-                        var percentComplete = evt.loaded / evt.total;
-                        percentComplete = parseInt(percentComplete * 100);
+                        const percentComplete = parseInt((evt.loaded / evt.total) * 100);
                         updateProgress(percentComplete);
                     }
                 }, false);
-                
                 return xhr;
             },
             success: function(response) {
-                console.log('Response:', response); // Debug
-                
-                // Complete progress
                 updateProgress(100);
-                
                 setTimeout(function() {
                     hideLoading();
-                    
                     if (response.success) {
                         $('#successMessage').text(response.message);
-                        $('#successModal').modal('show');
+                        $('#successModal').removeClass('hidden');
                         $('#formPendaftaran')[0].reset();
-                        $('#alert-container').empty();
+                        resetFileUploads();
                     } else {
-                        showAlert('danger', response.message || 'Pendaftaran gagal diproses.');
+                        showAlert('error', response.message || 'Pendaftaran gagal diproses.');
                     }
                 }, 500);
             },
             error: function(xhr, status, error) {
-                console.log('Error:', xhr.responseJSON, status, error); // Debug
-                
                 hideLoading();
-                
                 if (xhr.status === 422) {
-                    // Validation errors
-                    var response = xhr.responseJSON;
+                    const response = xhr.responseJSON;
                     if (response.errors) {
-                        var errorMessage = '<strong>Data tidak valid:</strong><ul class="mb-0 mt-2">';
-                        
+                        let errorMessage = '<strong>Data tidak valid:</strong><ul class="mt-2 ml-4 list-disc">';
                         $.each(response.errors, function(key, value) {
                             errorMessage += '<li>' + value[0] + '</li>';
-                            // Highlight invalid fields
-                            $('[name="' + key + '"]').addClass('is-invalid');
                         });
-                        
                         errorMessage += '</ul>';
-                        showAlert('danger', errorMessage);
-                    } else {
-                        showAlert('danger', response.message || 'Data yang dimasukkan tidak valid.');
+                        showAlert('error', errorMessage);
                     }
-                } else if (xhr.status === 500) {
-                    showAlert('danger', 'Terjadi kesalahan server. Silakan coba lagi atau hubungi administrator.');
-                } else if (status === 'timeout') {
-                    showAlert('warning', 'Koneksi terputus. Silakan periksa koneksi internet dan coba lagi.');
                 } else {
-                    showAlert('danger', 'Terjadi kesalahan tidak terduga. Silakan coba lagi.');
+                    showAlert('error', 'Terjadi kesalahan sistem. Silakan coba lagi.');
                 }
             }
         });
     });
-    
-    // Helper function untuk menampilkan alert
+
+    function validateForm() {
+        let isValid = true;
+        let errorMessage = '';
+
+        // Reset previous states
+        $('.border-red-500').removeClass('border-red-500');
+        $('#alert-container').empty();
+
+        // Validate NIK
+        const nik = $('#nik').val().trim();
+        if (!nik || nik.length !== 16 || !/^\d+$/.test(nik)) {
+            $('#nik').addClass('border-red-500');
+            errorMessage += 'NIK harus 16 digit angka.<br>';
+            isValid = false;
+        }
+
+        // Validate No. KK
+        const noKk = $('#no_kk').val().trim();
+        if (!noKk || noKk.length !== 16 || !/^\d+$/.test(noKk)) {
+            $('#no_kk').addClass('border-red-500');
+            errorMessage += 'No. Kartu Keluarga harus 16 digit angka.<br>';
+            isValid = false;
+        }
+
+        // Validate required fields
+        const requiredFields = ['nama', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'no_hp'];
+        requiredFields.forEach(field => {
+            if (!$('#' + field).val().trim()) {
+                $('#' + field).addClass('border-red-500');
+                isValid = false;
+            }
+        });
+
+        // Validate components
+        if ($('input[name="komponen[]"]:checked').length === 0) {
+            errorMessage += 'Pilih minimal satu komponen bantuan.<br>';
+            isValid = false;
+        }
+
+        // Validate files
+        if (!$('#kartu_keluarga')[0].files.length) {
+            errorMessage += 'Kartu keluarga wajib diunggah.<br>';
+            isValid = false;
+        }
+
+        if (!$('#foto_rumah')[0].files.length) {
+            errorMessage += 'Foto rumah wajib diunggah.<br>';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            showAlert('error', errorMessage);
+        }
+
+        return isValid;
+    }
+
     function showAlert(type, message) {
-        $('#alert-container').html(
-            '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
-            message +
-            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-            '<span aria-hidden="true">&times;</span></button></div>'
-        );
+        const alertColor = type === 'error' ? 'red' : 'green';
+        const alertIcon = type === 'error' ? 'exclamation-triangle' : 'check-circle';
+        
+        $('#alert-container').html(`
+            <div class="bg-${alertColor}-50 border border-${alertColor}-200 rounded-lg p-4 mb-6">
+                <div class="flex">
+                    <i class="fas fa-${alertIcon} text-${alertColor}-600 mr-3 mt-0.5"></i>
+                    <div class="text-${alertColor}-800">${message}</div>
+                </div>
+            </div>
+        `);
+        
         $('html, body').animate({scrollTop: 0}, 500);
     }
-    
-    // Reset form on modal close
-    $('#successModal').on('hidden.bs.modal', function() {
-        hideLoading();
-    });
-    
-    // Loading functions
+
     function showLoading() {
-        // Disable form elements
         $('#btnSubmit').prop('disabled', true);
-        $('#btnKembali').prop('disabled', true);
-        $('#formPendaftaran input, #formPendaftaran select, #formPendaftaran textarea').prop('disabled', true);
-        
-        // Change button appearance
-        $('#btnText').hide();
-        $('#btnLoader').show();
-        
-        // Show progress bar
-        $('#loadingProgress').show();
-        updateProgress(0);
-        
-        // Scroll to top to show progress
-        $('html, body').animate({scrollTop: 0}, 500);
+        $('#btnText').addClass('hidden');
+        $('#btnLoader').removeClass('hidden');
+        $('#loadingProgress').removeClass('hidden');
     }
-    
+
     function hideLoading() {
-        // Enable form elements
         $('#btnSubmit').prop('disabled', false);
-        $('#btnKembali').prop('disabled', false);
-        $('#formPendaftaran input, #formPendaftaran select, #formPendaftaran textarea').prop('disabled', false);
-        
-        // Reset button appearance
-        $('#btnText').show();
-        $('#btnLoader').hide();
-        
-        // Hide progress bar
-        $('#loadingProgress').hide();
+        $('#btnText').removeClass('hidden');
+        $('#btnLoader').addClass('hidden');
+        $('#loadingProgress').addClass('hidden');
     }
-    
+
     function updateProgress(percent) {
         $('#progressBar').css('width', percent + '%');
-        $('#progressText').text(percent + '%');
-        
-        if (percent >= 100) {
-            $('#progressBar').removeClass('progress-bar-striped progress-bar-animated');
-            $('#progressBar').addClass('bg-success');
-        }
     }
 
-    // Real-time validation
-    $('#nik').on('input', function() {
-        $(this).val($(this).val().replace(/\D/g, '').substring(0, 16));
-    });
+    function resetFileUploads() {
+        $('.border-dashed').removeClass('border-blue-500 bg-blue-50').addClass('border-gray-300');
+        $('.border-dashed p').first().text('Klik untuk upload');
+    }
 
-    $('#no_kk').on('input', function() {
-        $(this).val($(this).val().replace(/\D/g, '').substring(0, 16));
-    });
-
-    $('#no_hp').on('input', function() {
-        $(this).val($(this).val().replace(/\D/g, '').substring(0, 15));
+    // Input formatting
+    $('#nik, #no_kk, #no_hp').on('input', function() {
+        $(this).val($(this).val().replace(/\D/g, ''));
     });
 });
 </script>

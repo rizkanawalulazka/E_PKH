@@ -4,444 +4,369 @@
 @section('title', 'Daftar Pendamping')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Daftar Pendamping</h1>
-        @if(auth()->user() && auth()->user()->role === 'admin')
-            <div class="d-flex">
-                <button type="button" class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#addPendampingModal">
-                    <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Pendamping
-                </button>
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-blue-100 rounded-lg">
+                <i class="fas fa-user-friends text-blue-600 text-xl"></i>
             </div>
+            <h1 class="text-2xl font-bold text-gray-900">Daftar Pendamping</h1>
+        </div>
+        @if(auth()->user()->role === 'admin')
+        <button onclick="openAddModal()" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+            <i class="fas fa-plus mr-2"></i>
+            Tambah Pendamping
+        </button>
         @endif
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div class="flex">
+            <i class="fas fa-check-circle text-green-600 mr-3 mt-0.5"></i>
+            <div class="text-green-800">{{ session('success') }}</div>
         </div>
+    </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex">
+            <i class="fas fa-exclamation-triangle text-red-600 mr-3 mt-0.5"></i>
+            <div class="text-red-800">{{ session('error') }}</div>
         </div>
+    </div>
     @endif
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Data Pendamping PKH</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>NIK</th>
-                            <th>Nama</th>
-                            <th>No HP</th>
-                            <th>Alamat</th>
-                            <th>Wilayah Kerja</th>
-                            <th>Status</th>
-                            <th>Jumlah Penerima</th>
-                            @if(auth()->user() && auth()->user()->role === 'admin')
-                                <th>Aksi</th>
-                            @endif
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($pendampings as $key => $pendamping)
-                        <tr>
-                            <td>{{ $key + 1 }}</td>
-                            <td>{{ $pendamping->nik }}</td>
-                            <td>{{ $pendamping->name }}</td>
-                            <td>{{ $pendamping->pendamping->no_hp ?? '-' }}</td>
-                            <td>{{ $pendamping->pendamping->alamat ?? '-' }}</td>
-                            <td>{{ $pendamping->pendamping->wilayah_kerja ?? '-' }}</td>
-                            <td>
-                                @if($pendamping->pendamping && $pendamping->pendamping->status === 'active')
-                                    <span class="badge badge-success">Aktif</span>
-                                @else
-                                    <span class="badge badge-secondary">Tidak Aktif</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge badge-info">
-                                    {{ $pendamping->pendamping->pendaftaran_count ?? 0 }} Penerima
-                                </span>
-                            </td>
-                            @if(auth()->user() && auth()->user()->role === 'admin')
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-info btn-sm" onclick="editPendamping({{ $pendamping->id }})" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-warning btn-sm" onclick="toggleStatus({{ $pendamping->id }})" title="Toggle Status">
-                                            <i class="fas fa-toggle-on"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="deletePendamping({{ $pendamping->id }})" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            @endif
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Total Pendamping</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $pendampings->count() }}</p>
+                </div>
+                <div class="p-3 bg-blue-100 rounded-full">
+                    <i class="fas fa-users text-blue-600 text-xl"></i>
+                </div>
             </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Pendamping Aktif</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $pendampings->where('status', 'aktif')->count() }}</p>
+                </div>
+                <div class="p-3 bg-green-100 rounded-full">
+                    <i class="fas fa-user-check text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Wilayah Kerja</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $pendampings->pluck('wilayah_kerja')->unique()->count() }}</p>
+                </div>
+                <div class="p-3 bg-purple-100 rounded-full">
+                    <i class="fas fa-map-marked-alt text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Data Pendamping</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full" id="pendampingTable">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIK</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No HP</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wilayah Kerja</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        @if(auth()->user()->role === 'admin')
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        @endif
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($pendampings as $i => $p)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $i+1 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ $p->nama_lengkap }}</div>
+                                    <div class="text-sm text-gray-500">{{ $p->user->email ?? 'Tidak ada email' }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $p->user->nik ?? 'Tidak ada NIK' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $p->no_hp }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                {{ $p->wilayah_kerja }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($p->status == 'aktif')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Aktif
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-times-circle mr-1"></i>
+                                    Tidak Aktif
+                                </span>
+                            @endif
+                        </td>
+                        @if(auth()->user()->role === 'admin')
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <button onclick="editPendamping({{ $p->id }})" class="inline-flex items-center px-3 py-1 bg-yellow-600 text-white text-xs font-medium rounded-md hover:bg-yellow-700 transition-colors">
+                                    <i class="fas fa-edit mr-1"></i>
+                                    Edit
+                                </button>
+                                <button onclick="deletePendamping({{ $p->id }})" class="inline-flex items-center px-3 py-1 bg-red-600 text-white text-xs font-medium rounded-md hover:bg-red-700 transition-colors">
+                                    <i class="fas fa-trash mr-1"></i>
+                                    Hapus
+                                </button>
+                            </div>
+                        </td>
+                        @endif
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="{{ auth()->user()->role === 'admin' ? '7' : '6' }}" class="px-6 py-8 text-center text-sm text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-user-friends text-gray-300 text-4xl mb-3"></i>
+                                <p>Belum ada data pendamping</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
+@if(auth()->user()->role === 'admin')
 <!-- Modal Tambah Pendamping -->
-<div class="modal fade" id="addPendampingModal" tabindex="-1" role="dialog" aria-labelledby="addPendampingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addPendampingModalLabel">Tambah Pendamping Baru</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form id="addPendampingForm">
-                @csrf
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="nik">NIK <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nik" name="nik" maxlength="16" required>
-                                <small class="form-text text-muted">16 digit angka</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="name">Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password">Password <span class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="password" name="password" minlength="6" required>
-                        <small class="form-text text-muted">Minimal 6 karakter</small>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="no_hp">No. HP <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="no_hp" name="no_hp" maxlength="15" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="wilayah_kerja">Wilayah Kerja <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="wilayah_kerja" name="wilayah_kerja" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="alamat">Alamat <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="alamat" name="alamat" rows="3" required></textarea>
-                    </div>
+<div id="addPendampingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Tambah Pendamping Baru</h3>
+        </div>
+        <form id="addPendampingForm" action="{{ route('pendamping.store') }}" method="POST">
+            @csrf
+            <div class="p-6 space-y-4">
+                <div>
+                    <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                    <input type="text" id="nama_lengkap" name="nama_lengkap" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan
+                <div>
+                    <label for="nik" class="block text-sm font-medium text-gray-700 mb-2">NIK</label>
+                    <input type="text" id="nik" name="nik" maxlength="16" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="email" name="email" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="no_hp" class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
+                    <input type="text" id="no_hp" name="no_hp" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="wilayah_kerja" class="block text-sm font-medium text-gray-700 mb-2">Wilayah Kerja</label>
+                    <input type="text" id="wilayah_kerja" name="wilayah_kerja" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="alamat" class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                    <textarea id="alamat" name="alamat" rows="3" required
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="password" name="password" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200">
+                <div class="flex space-x-3">
+                    <button type="button" onclick="closeAddModal()" class="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                        Simpan
                     </button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- Modal Edit Pendamping -->
-<div class="modal fade" id="editPendampingModal" tabindex="-1" role="dialog" aria-labelledby="editPendampingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editPendampingModalLabel">Edit Pendamping</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form id="editPendampingForm">
-                @csrf
-                @method('PUT')
-                <input type="hidden" id="edit_id" name="id">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit_nik">NIK <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit_nik" name="nik" maxlength="16" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit_name">Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit_name" name="name" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="edit_password">Password</label>
-                        <input type="password" class="form-control" id="edit_password" name="password" minlength="6">
-                        <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah password</small>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit_no_hp">No. HP <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit_no_hp" name="no_hp" maxlength="15" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="edit_wilayah_kerja">Wilayah Kerja <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit_wilayah_kerja" name="wilayah_kerja" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="edit_alamat">Alamat <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="edit_alamat" name="alamat" rows="3" required></textarea>
-                    </div>
+<div id="editPendampingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Edit Pendamping</h3>
+        </div>
+        <form id="editPendampingForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="p-6 space-y-4">
+                <div>
+                    <label for="edit_nama_lengkap" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                    <input type="text" id="edit_nama_lengkap" name="nama_lengkap" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Update
+                <div>
+                    <label for="edit_nik" class="block text-sm font-medium text-gray-700 mb-2">NIK</label>
+                    <input type="text" id="edit_nik" name="nik" maxlength="16" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="edit_email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="edit_email" name="email" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="edit_no_hp" class="block text-sm font-medium text-gray-700 mb-2">No HP</label>
+                    <input type="text" id="edit_no_hp" name="no_hp" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="edit_wilayah_kerja" class="block text-sm font-medium text-gray-700 mb-2">Wilayah Kerja</label>
+                    <input type="text" id="edit_wilayah_kerja" name="wilayah_kerja" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="edit_alamat" class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                    <textarea id="edit_alamat" name="alamat" rows="3" required
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div>
+                    <label for="edit_status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="edit_status" name="status" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="aktif">Aktif</option>
+                        <option value="tidak_aktif">Tidak Aktif</option>
+                    </select>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200">
+                <div class="flex space-x-3">
+                    <button type="button" onclick="closeEditModal()" class="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                        Update
                     </button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
+@endif
 @endsection
 
 @section('scripts')
-<!-- Page level plugins -->
-<script src="{{ asset('sbadmin2/vendor/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('sbadmin2/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-
 <script>
-    $(document).ready(function() {
-        $('#dataTable').DataTable({
-            "pageLength": 25,
-            "order": [[ 0, "asc" ]]
-        });
-        
-        // Handle form tambah pendamping
-        $('#addPendampingForm').on('submit', function(e) {
-            e.preventDefault();
-            
-            $.ajax({
-                url: '/admin/pendamping/store',
-                method: 'POST',
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (response.success) {
-                        $('#addPendampingModal').modal('hide');
-                        $('#addPendampingForm')[0].reset();
-                        
-                        // Tampilkan pesan sukses
-                        $('.container-fluid').prepend(
-                            '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
-                            '<i class="fas fa-check-circle"></i> ' + response.message +
-                            '<button type="button" class="close" data-dismiss="alert">' +
-                            '<span>&times;</span></button></div>'
-                        );
-                        
-                        // Reload halaman setelah 1 detik
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
-                    } else {
-                        alert('Error: ' + response.message);
-                    }
-                },
-                error: function(xhr) {
-                    var errorMessage = 'Terjadi kesalahan';
-                    
-                    if (xhr.responseJSON) {
-                        if (xhr.responseJSON.errors) {
-                            errorMessage = 'Validasi gagal:\n';
-                            $.each(xhr.responseJSON.errors, function(field, messages) {
-                                errorMessage += '- ' + messages.join('\n- ') + '\n';
-                            });
-                        } else if (xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        }
-                    }
-                    
-                    alert(errorMessage);
-                }
-            });
-        });
-        
-        // Handle form edit pendamping
-        $('#editPendampingForm').on('submit', function(e) {
-            e.preventDefault();
-            
-            var id = $('#edit_id').val();
-            
-            $.ajax({
-                url: '/admin/pendamping/' + id + '/update',
-                method: 'POST',
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (response.success) {
-                        $('#editPendampingModal').modal('hide');
-                        
-                        // Tampilkan pesan sukses
-                        $('.container-fluid').prepend(
-                            '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
-                            '<i class="fas fa-check-circle"></i> ' + response.message +
-                            '<button type="button" class="close" data-dismiss="alert">' +
-                            '<span>&times;</span></button></div>'
-                        );
-                        
-                        // Reload halaman setelah 1 detik
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
-                    } else {
-                        alert('Error: ' + response.message);
-                    }
-                },
-                error: function(xhr) {
-                    var errorMessage = 'Terjadi kesalahan';
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        errorMessage = Object.values(xhr.responseJSON.errors).join('\n');
-                    }
-                    alert(errorMessage);
-                }
-            });
-        });
-        
-        // Reset form saat modal ditutup
-        $('#addPendampingModal').on('hidden.bs.modal', function() {
-            $('#addPendampingForm')[0].reset();
-            $('.form-control').removeClass('is-invalid');
-        });
-        
-        // Validasi input NIK dan No HP (hanya angka)
-        $('#nik, #edit_nik').on('input', function() {
-            $(this).val($(this).val().replace(/\D/g, ''));
-        });
-        
-        $('#no_hp, #edit_no_hp').on('input', function() {
-            $(this).val($(this).val().replace(/\D/g, ''));
-        });
+$(document).ready(function() {
+    $('#pendampingTable').DataTable({
+        responsive: true,
+        language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ data per halaman",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            infoEmpty: "Tidak ada data yang ditampilkan",
+            infoFiltered: "(difilter dari _MAX_ total data)",
+            paginate: {
+                first: "Pertama",
+                last: "Terakhir",
+                next: "Selanjutnya",
+                previous: "Sebelumnya"
+            }
+        }
     });
-    
-    // Fungsi untuk edit pendamping
-    function editPendamping(id) {
+});
+
+@if(auth()->user()->role === 'admin')
+function openAddModal() {
+    document.getElementById('addPendampingModal').classList.remove('hidden');
+}
+
+function closeAddModal() {
+    document.getElementById('addPendampingModal').classList.add('hidden');
+}
+
+function closeEditModal() {
+    document.getElementById('editPendampingModal').classList.add('hidden');
+}
+
+function editPendamping(id) {
+    $.ajax({
+        url: '/pendamping/' + id + '/edit',
+        method: 'GET',
+        success: function(response) {
+            $('#edit_nama_lengkap').val(response.nama_lengkap);
+            $('#edit_nik').val(response.user ? response.user.nik : '');
+            $('#edit_email').val(response.user ? response.user.email : '');
+            $('#edit_no_hp').val(response.no_hp);
+            $('#edit_wilayah_kerja').val(response.wilayah_kerja);
+            $('#edit_alamat').val(response.alamat);
+            $('#edit_status').val(response.status);
+            
+            $('#editPendampingForm').attr('action', '/pendamping/' + id);
+            document.getElementById('editPendampingModal').classList.remove('hidden');
+        },
+        error: function() {
+            alert('Gagal memuat data pendamping');
+        }
+    });
+}
+
+function deletePendamping(id) {
+    if (confirm('Apakah Anda yakin ingin menghapus pendamping ini?')) {
         $.ajax({
-            url: '/admin/pendamping/' + id + '/edit',
-            method: 'GET',
+            url: '/pendamping/' + id,
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
             success: function(response) {
                 if (response.success) {
-                    var data = response.data;
-                    
-                    $('#edit_id').val(data.id);
-                    $('#edit_nik').val(data.nik);
-                    $('#edit_name').val(data.name);
-                    $('#edit_no_hp').val(data.pendamping ? data.pendamping.no_hp : '');
-                    $('#edit_wilayah_kerja').val(data.pendamping ? data.pendamping.wilayah_kerja : '');
-                    $('#edit_alamat').val(data.pendamping ? data.pendamping.alamat : '');
-                    
-                    $('#editPendampingModal').modal('show');
+                    alert('Pendamping berhasil dihapus');
+                    location.reload();
                 } else {
-                    alert('Error: ' + response.message);
+                    alert(response.message || 'Gagal menghapus pendamping');
                 }
             },
-            error: function(xhr) {
-                alert('Terjadi kesalahan saat mengambil data');
+            error: function() {
+                alert('Terjadi kesalahan sistem');
             }
         });
     }
-    
-    // Fungsi untuk toggle status
-    function toggleStatus(id) {
-        if (confirm('Apakah Anda yakin ingin mengubah status pendamping ini?')) {
-            $.ajax({
-                url: '/admin/pendamping/' + id + '/toggle-status',
-                method: 'POST',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        location.reload();
-                    } else {
-                        alert('Error: ' + response.message);
-                    }
-                },
-                error: function(xhr) {
-                    alert('Terjadi kesalahan');
-                }
-            });
-        }
-    }
-    
-    // Fungsi untuk hapus pendamping
-    function deletePendamping(id) {
-        if (confirm('Apakah Anda yakin ingin menghapus pendamping ini? Tindakan ini tidak dapat dibatalkan.')) {
-            $.ajax({
-                url: '/admin/pendamping/' + id + '/delete',
-                method: 'DELETE',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        location.reload();
-                    } else {
-                        alert('Error: ' + response.message);
-                    }
-                },
-                error: function(xhr) {
-                    alert('Terjadi kesalahan');
-                }
-            });
-        }
-    }
+}
+@endif
 </script>
-@endsection
-
-@section('styles')
-<!-- Custom styles for this page -->
-<link href="{{ asset('sbadmin2/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-<style>
-    .btn-group .btn {
-        margin-right: 2px;
-    }
-    
-    .btn-group .btn:last-child {
-        margin-right: 0;
-    }
-    
-    .modal-body .form-group {
-        margin-bottom: 1rem;
-    }
-</style>
 @endsection

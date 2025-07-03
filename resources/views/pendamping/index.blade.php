@@ -3,212 +3,192 @@
 @section('title', $title)
 
 @section('content')
-<div class="container-fluid">
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-user-friends mr-2"></i>
-            Dashboard Pendamping
-            @if(auth()->user()->role === 'pendamping' && $pendampingProfile)
-                <small class="text-muted">- {{ $pendampingProfile->user->name }}</small>
-            @endif
-        </h1>
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex items-center space-x-3">
+        <div class="p-2 bg-blue-100 rounded-lg">
+            <i class="fas fa-user-friends text-blue-600 text-xl"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">Dashboard Pendamping</h1>
     </div>
 
     @if(auth()->user()->role === 'pendamping' && $pendampingProfile)
     <!-- Info Pendamping Card -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-left-info shadow">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <h5 class="card-title text-info">
-                                <i class="fas fa-user-tie mr-2"></i>Informasi Pendamping
-                            </h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p class="mb-1"><strong>Nama:</strong> {{ $pendampingProfile->user->name }}</p>
-                                    <p class="mb-1"><strong>Email:</strong> {{ $pendampingProfile->user->email }}</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p class="mb-1"><strong>No. HP:</strong> {{ $pendampingProfile->no_hp ?? '-' }}</p>
-                                    <p class="mb-1"><strong>Alamat:</strong> {{ $pendampingProfile->alamat ?? '-' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-right">
-                            <div class="text-info">
-                                <i class="fas fa-users fa-3x"></i>
-                            </div>
-                        </div>
-                    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-blue-600 text-2xl"></i>
                 </div>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-semibold text-gray-900">{{ $pendampingProfile->nama_lengkap }}</h3>
+                <div class="mt-2 space-y-1">
+                    <p class="text-sm text-gray-600"><i class="fas fa-phone mr-2"></i>{{ $pendampingProfile->no_hp }}</p>
+                    <p class="text-sm text-gray-600"><i class="fas fa-map-marker-alt mr-2"></i>{{ $pendampingProfile->wilayah_kerja }}</p>
+                    <p class="text-sm text-gray-600"><i class="fas fa-home mr-2"></i>{{ $pendampingProfile->alamat }}</p>
+                </div>
+            </div>
+            <div class="flex-shrink-0">
+                @if($pendampingProfile->status == 'aktif')
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        Aktif
+                    </span>
+                @else
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                        <i class="fas fa-times-circle mr-1"></i>
+                        Tidak Aktif
+                    </span>
+                @endif
             </div>
         </div>
     </div>
     @endif
 
-    <!-- Content Row - Statistics -->
-    <div class="row">
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Total Penerima Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Penerima Didampingi</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalPenerima }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Total Penerima</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $totalPenerima ?? 0 }}</p>
+                </div>
+                <div class="p-3 bg-blue-100 rounded-full">
+                    <i class="fas fa-users text-blue-600 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Penerima Selesai Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Selesai Didampingi</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $penerimaSelesai }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Penerima Selesai</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $penerimaSelesai ?? 0 }}</p>
+                </div>
+                <div class="p-3 bg-green-100 rounded-full">
+                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Penerima Proses Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Dalam Proses</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $penerimaProses }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clock fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Penerima Proses</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $penerimaProses ?? 0 }}</p>
+                </div>
+                <div class="p-3 bg-yellow-100 rounded-full">
+                    <i class="fas fa-hourglass-half text-yellow-600 text-xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Belum Didampingi Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-secondary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
-                                Belum Didampingi</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $penerimaBelumDidampingi }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user-clock fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Belum Didampingi</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ $belumDidampingi ?? 0 }}</p>
+                </div>
+                <div class="p-3 bg-red-100 rounded-full">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Content Row -->
-    <div class="row">
-        <!-- Daftar Penerima -->
-        <div class="col-xl-12 col-lg-12">
-            <div class="card shadow mb-4">
-                <!-- Card Header -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        @if(auth()->user()->role === 'pendamping')
-                            Daftar Penerima yang Saya Dampingi
-                        @else
-                            Daftar Penerima Bantuan
-                        @endif
-                    </h6>
-                    <a href="{{ route('pendamping.penerima') }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-users fa-sm mr-1"></i> Lihat Semua
-                    </a>
-                </div>
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>NIK</th>
-                                    <th>Nama</th>
-                                    <th>Status Pendampingan</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($penerima->take(5) as $p)
-                                <tr>
-                                    <td>{{ $p->nik }}</td>
-                                    <td>{{ $p->name }}</td>
-                                    <td>
-                                        @php
-                                            $statusClass = '';
-                                            $statusText = 'Belum Didampingi';
-                                            if ($p->report_status) {
-                                                $statusText = $p->report_status;
-                                                $statusClass = (
-                                                    $p->report_status === 'Selesai' ? 'badge-success' :
-                                                    ($p->report_status === 'Proses' ? 'badge-warning' : 'badge-secondary')
-                                                );
-                                            } else {
-                                                $statusClass = 'badge-secondary';
-                                            }
-                                        @endphp
-                                        @if($p->report_status && auth()->user()->role === 'pendamping')
-                                            <select class="form-control form-control-sm update-status-select" data-penerima-id="{{ $p->id }}">
-                                                <option value="Proses" {{ $p->report_status === 'Proses' ? 'selected' : '' }}>Proses</option>
-                                                <option value="Selesai" {{ $p->report_status === 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                                            </select>
-                                        @else
-                                            <span class="badge {{ $statusClass }} status-display-{{ $p->id }}">{{ $statusText }}</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if(auth()->user()->role === 'pendamping')
-                                            <a href="{{ route('pendamping.laporan.buat', $p->id) }}" 
-                                               class="btn btn-primary btn-sm">
-                                                <i class="fas fa-plus fa-sm"></i> Buat Laporan
-                                            </a>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="4" class="text-center">
-                                        @if(auth()->user()->role === 'pendamping')
-                                            Belum ada penerima yang didampingi
-                                        @else
-                                            Tidak ada data penerima
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    <!-- Daftar Penerima -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">Daftar Penerima</h2>
+                <a href="{{ route('pendamping.laporan.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    Buat Laporan
+                </a>
             </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Penerima</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIK</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alamat</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No HP</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Komponen</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($penerima as $i => $p)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $i+1 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ $p->nama }}</div>
+                                    <div class="text-sm text-gray-500">{{ $p->tempat_lahir }}, {{ \Carbon\Carbon::parse($p->tanggal_lahir)->format('d M Y') }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $p->nik }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            <div class="max-w-xs truncate">{{ $p->alamat }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $p->no_hp }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex flex-wrap gap-1">
+                                @if(is_array($p->komponen))
+                                    @foreach($p->komponen as $komponen)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                            @if($komponen == 'kesehatan') bg-red-100 text-red-800
+                                            @elseif($komponen == 'pendidikan') bg-blue-100 text-blue-800
+                                            @else bg-green-100 text-green-800
+                                            @endif">
+                                            {{ ucfirst(str_replace('_', ' ', $komponen)) }}
+                                        </span>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <select class="update-status-select px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" data-penerima-id="{{ $p->id }}">
+                                <option value="belum_didampingi" {{ $p->status_pendampingan == 'belum_didampingi' ? 'selected' : '' }}>Belum Didampingi</option>
+                                <option value="dalam_proses" {{ $p->status_pendampingan == 'dalam_proses' ? 'selected' : '' }}>Dalam Proses</option>
+                                <option value="selesai" {{ $p->status_pendampingan == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                            </select>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ route('pendamping.laporan.create', ['penerima_id' => $p->id]) }}" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-plus mr-1"></i>
+                                Buat Laporan
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-users text-gray-300 text-4xl mb-3"></i>
+                                <p>Belum ada data penerima</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -220,52 +200,32 @@ $(document).ready(function() {
     $('.update-status-select').on('change', function() {
         var penerimaId = $(this).data('penerima-id');
         var newStatus = $(this).val();
-        var csrfToken = $('meta[name="csrf-token"]').attr('content');
-        var statusSpan = $('.status-display-' + penerimaId);
-
+        
         $.ajax({
-            url: '/pendamping/penerima/' + penerimaId + '/update-status',
+            url: '/pendamping/update-status/' + penerimaId,
             method: 'POST',
             data: {
-                _token: csrfToken,
-                status: newStatus
+                status: newStatus,
+                _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                if (response.success) {
-                    // Update tampilan badge jika ada
-                    if (statusSpan.length > 0) {
-                        statusSpan.text(response.new_status);
-                        statusSpan.removeClass('badge-success badge-warning badge-secondary');
-                        if (response.new_status === 'Selesai') {
-                            statusSpan.addClass('badge-success');
-                        } else if (response.new_status === 'Proses') {
-                            statusSpan.addClass('badge-warning');
-                        } else {
-                            statusSpan.addClass('badge-secondary');
-                        }
-                    }
-                    
-                    // Refresh halaman untuk update statistik
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                    
-                    alert(response.message);
+                if(response.success) {
+                    // Show success notification
+                    showNotification('success', 'Status berhasil diperbarui');
                 } else {
-                    alert('Gagal memperbarui status: ' + response.message);
+                    showNotification('error', response.message || 'Terjadi kesalahan');
                 }
             },
-            error: function(xhr) {
-                var errorMessage = 'Terjadi kesalahan.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
-                } else if (xhr.responseText) {
-                    errorMessage = xhr.responseText;
-                }
-                alert('Error: ' + errorMessage);
+            error: function() {
+                showNotification('error', 'Terjadi kesalahan sistem');
             }
         });
     });
 });
+
+function showNotification(type, message) {
+    // Simple notification implementation
+    alert(message);
+}
 </script>
 @endsection
