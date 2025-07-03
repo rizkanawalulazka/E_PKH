@@ -54,7 +54,7 @@ class PendaftaranController extends Controller
                 'no_hp' => 'required|string|min:10|max:15',
                 'komponen' => 'required|array|min:1',
                 'komponen.*' => 'in:kesehatan,pendidikan,kesejahteraan_sosial',
-                'kartu_keluarga' => 'required|file|image|mimes:jpeg,png,jpg|max:2048'
+                'kartu_keluarga' => 'required|file|image|mimes:jpeg,png,jpg|max:2048',
                 'foto_rumah' => 'required|image|mimes:jpeg,jpg,png|max:2048',
 
             ], [

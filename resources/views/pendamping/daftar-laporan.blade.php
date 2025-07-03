@@ -1,3 +1,4 @@
+<?php
 @extends('layouts.app')
 
 @section('title', $title)
@@ -41,9 +42,21 @@
                             <tbody>
                                 @forelse($laporan as $lap)
                                 <tr>
-                                    <td>{{ \Carbon\Carbon::parse($lap->tanggal)->format('d/m/Y') ?? '-' }}</td>
-                                    <td>{{ optional($lap->pendamping->user)->name ?? '-' }}</td>
-                                    <td>{{ optional($lap->penerima)->name ?? '-' }}</td>
+                                    <td>{{ $lap->tanggal ? \Carbon\Carbon::parse($lap->tanggal)->format('d/m/Y') : '-' }}</td>
+                                    <td>
+                                        @if($lap->pendamping && $lap->pendamping->user)
+                                            {{ $lap->pendamping->user->name }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($lap->penerima)
+                                            {{ $lap->penerima->name }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                     <td>{{ $lap->kegiatan ?? '-' }}</td>
                                     <td>
                                         @if(auth()->user()->role === 'admin')
@@ -56,7 +69,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if(isset($lap->foto) && $lap->foto)
+                                        @if($lap->foto)
                                             <a href="{{ asset('storage/'.$lap->foto) }}" target="_blank">
                                                 <img src="{{ asset('storage/'.$lap->foto) }}" alt="foto" width="40" class="img-thumbnail">
                                             </a>
@@ -72,11 +85,14 @@
                                                 <option value="rejected" {{ ($lap->verifikasi_status ?? '') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
                                             </select>
                                         @else
-                                            @if(isset($lap->verifikasi_status) && $lap->verifikasi_status == 'pending')
+                                            @php
+                                                $verifikasi = $lap->verifikasi_status ?? 'pending';
+                                            @endphp
+                                            @if($verifikasi == 'pending')
                                                 <span class="badge badge-warning">Pending</span>
-                                            @elseif(isset($lap->verifikasi_status) && $lap->verifikasi_status == 'approved')
+                                            @elseif($verifikasi == 'approved')
                                                 <span class="badge badge-success">Disetujui</span>
-                                            @elseif(isset($lap->verifikasi_status) && $lap->verifikasi_status == 'rejected')
+                                            @elseif($verifikasi == 'rejected')
                                                 <span class="badge badge-danger">Ditolak</span>
                                             @else
                                                 <span class="badge badge-secondary">-</span>
@@ -93,3 +109,175 @@
                                 </tr>
                                 @empty
                                 <tr>
+                                    <td colspan="{{ auth()->user()->role === 'admin' ? '8' : '7' }}" class="text-center">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">Belum ada laporan pendampingan</p>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detail Laporan -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalLabel">Detail Laporan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="detailContent">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+$(document).ready(function() {
+    // Update status laporan
+    $('.update-status-laporan').on('change', function() {
+        var laporanId = $(this).data('laporan-id');
+        var newStatus = $(this).val();
+        
+        $.ajax({
+            url: '/pendamping/laporan/' + laporanId + '/update-status',
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                status: newStatus
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert('Status berhasil diperbarui');
+                    location.reload();
+                } else {
+                    alert('Gagal memperbarui status');
+                }
+            },
+            error: function() {
+                alert('Terjadi kesalahan');
+            }
+        });
+    });
+    
+    // Update verifikasi laporan
+    $('.update-verifikasi-laporan').on('change', function() {
+        var laporanId = $(this).data('laporan-id');
+        var newVerifikasi = $(this).val();
+        
+        $.ajax({
+            url: '/pendamping/laporan/' + laporanId + '/update-verifikasi',
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                verifikasi_status: newVerifikasi
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert('Verifikasi berhasil diperbarui');
+                    location.reload();
+                } else {
+                    alert('Gagal memperbarui verifikasi');
+                }
+            },
+            error: function() {
+                alert('Terjadi kesalahan');
+            }
+        });
+    });
+});
+
+// Function untuk view detail
+function viewDetail(laporanId) {
+    $.ajax({
+        url: '/pendamping/laporan/' + laporanId + '/detail',
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                var laporan = response.data;
+                var pendampingName = '-';
+                var penerimaName = '-';
+                
+                // Safe check untuk pendamping
+                if (laporan.pendamping && laporan.pendamping.user) {
+                    pendampingName = laporan.pendamping.user.name;
+                }
+                
+                // Safe check untuk penerima
+                if (laporan.penerima) {
+                    penerimaName = laporan.penerima.name;
+                }
+                
+                var content = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Informasi Laporan</h6>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td><strong>Tanggal:</strong></td>
+                                    <td>${laporan.tanggal || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Pendamping:</strong></td>
+                                    <td>${pendampingName}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Penerima:</strong></td>
+                                    <td>${penerimaName}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kegiatan:</strong></td>
+                                    <td>${laporan.kegiatan || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td><span class="badge badge-${laporan.status == 'Selesai' ? 'success' : 'warning'}">${laporan.status || '-'}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Verifikasi:</strong></td>
+                                    <td><span class="badge badge-${laporan.verifikasi_status == 'approved' ? 'success' : (laporan.verifikasi_status == 'rejected' ? 'danger' : 'warning')}">${laporan.verifikasi_status || 'pending'}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Foto Kegiatan</h6>
+                            ${laporan.foto ? `<img src="/storage/${laporan.foto}" class="img-fluid" alt="Foto Kegiatan">` : '<p class="text-muted">Tidak ada foto</p>'}
+                        </div>
+                    </div>
+                    ${laporan.catatan ? `
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>Catatan:</h6>
+                            <p>${laporan.catatan}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+                
+                $('#detailContent').html(content);
+                $('#detailModal').modal('show');
+            } else {
+                alert('Gagal memuat detail laporan');
+            }
+        },
+        error: function() {
+            alert('Terjadi kesalahan');
+        }
+    });
+}
+</script>
+@endsection

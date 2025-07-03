@@ -20,7 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Protected routes (perlu login)
 Route::middleware(['auth'])->group(function () {
-    // Dashboard route - PINDAH KE SINI
+    // Dashboard route
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // PKH Registration routes
@@ -42,6 +42,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pendamping/penerima/{penerima_id}/update-status', [PendampingController::class, 'updatePenerimaReportStatus'])->name('pendamping.penerima.update_status');
 
     Route::post('/admin/pendaftaran/{id}/update-status', [PendaftaranController::class, 'updateStatusPendaftaran'])->name('admin.pendaftaran.update-status');
+    
+    // Admin routes - PINDAH KE SINI (tanpa middleware role)
+    Route::post('/admin/pendamping/store', [PendampingController::class, 'store'])->name('pendamping.store');
+    Route::get('/admin/pendamping/{id}/edit', [PendampingController::class, 'edit'])->name('pendamping.edit');
+    Route::post('/admin/pendamping/{id}/update', [PendampingController::class, 'update'])->name('pendamping.update');
+    Route::post('/admin/pendamping/{id}/toggle-status', [PendampingController::class, 'toggleStatus'])->name('pendamping.toggle-status');
+    Route::delete('/admin/pendamping/{id}/delete', [PendampingController::class, 'destroy'])->name('pendamping.destroy');
+    Route::get('/admin/pendamping/export', [PendampingController::class, 'export'])->name('pendamping.export');
 });
+
 
 

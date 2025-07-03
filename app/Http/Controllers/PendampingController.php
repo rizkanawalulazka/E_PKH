@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\LaporanPendampingan;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pendaftaran;
+use Illuminate\Support\Facades\Hash;
 
 class PendampingController extends Controller
 {
@@ -22,8 +23,15 @@ class PendampingController extends Controller
 
         // Jika user adalah pendamping atau admin, tampilkan daftar pendamping
         if ($user->role === 'pendamping' || $user->role === 'admin') {
-            $pendampings = \App\Models\Pendamping::with('user')->get();
-            return view('pendamping.list', [
+            $pendampings = User::where('role', 'pendamping')
+                ->with(['pendamping' => function($query) {
+                    $query->withCount(['pendaftaran' => function($subQuery) {
+                        $subQuery->where('status', 'approved');
+                    }]);
+                }])
+                ->get();
+                
+            return view('pendamping.daftar-pendamping', [
                 'pendampings' => $pendampings,
                 'title' => 'Daftar Pendamping',
                 'menuPendampingList' => 'active',
@@ -169,21 +177,13 @@ class PendampingController extends Controller
 
     public function daftarLaporan()
     {
-        $user = Auth::user();
-        if ($user->role === 'admin') {
-            $laporan = LaporanPendampingan::with(['pendamping.user', 'penerima'])->latest()->get();
-        } else if ($user->role === 'pendamping') {
-            $pendamping = $user->pendamping;
-            $laporan = LaporanPendampingan::with(['pendamping.user', 'penerima'])
-                ->where('pendamping_id', $pendamping->id)
-                ->latest()->get();
-        } else {
-            $laporan = [];
-        }
+        $laporan = LaporanPendampingan::with(['pendamping.user', 'penerima'])
+            ->orderBy('tanggal', 'desc')
+            ->get();
+        
         return view('pendamping.daftar-laporan', [
-            'laporan' => $laporan,
-            'title' => 'Daftar Laporan Pendampingan',
-            'menuLaporan' => 'active',
+            'title' => 'Daftar Laporan',
+            'laporan' => $laporan
         ]);
     }
 
@@ -264,4 +264,232 @@ class PendampingController extends Controller
             return \App\Models\Pendamping::with('user')->first();
         }
     }
+
+    public function store(Request $request)
+    {
+        // Check role admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized - Hanya admin yang dapat menambah pendamping'
+            ], 403);
+        }
+
+        try {
+            $validated = $request->validate([
+                'nik' => 'required|digits:16|unique:users,nik',
+                'name' => 'required|string|max:255',
+                'password' => 'required|min:6',
+                'no_hp' => 'required|digits_between:10,15',
+                'alamat' => 'required|string',
+                'wilayah_kerja' => 'required|string'
+            ]);
+
+            // Buat user pendamping
+            $user = User::create([
+                'nik' => $validated['nik'],
+                'name' => $validated['name'],
+                'password' => Hash::make($validated['password']),
+                'role' => 'pendamping'
+            ]);
+
+            // Buat data pendamping
+            $pendamping = Pendamping::create([
+                'user_id' => $user->id,
+                'no_hp' => $validated['no_hp'],
+                'alamat' => $validated['alamat'],
+                'wilayah_kerja' => $validated['wilayah_kerja'],
+                'status' => 'active'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pendamping berhasil ditambahkan!'
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak valid',
+                'errors' => $e->errors()
+            ], 422);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error creating pendamping:', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem'
+            ], 500);
+        }
+    }
+
+    public function edit($id)
+    {
+        // Check role admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        try {
+            $user = User::with('pendamping')->findOrFail($id);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $user
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ], 404);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Check role admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $request->validate([
+            'nik' => 'required|digits:16|unique:users,nik,' . $id,
+            'name' => 'required|string|max:255',
+            'password' => 'nullable|min:6',
+            'no_hp' => 'required|digits_between:10,15',
+            'alamat' => 'required|string',
+            'wilayah_kerja' => 'required|string'
+        ]);
+
+        try {
+            $user = User::findOrFail($id);
+            
+            // Update user data
+            $user->update([
+                'nik' => $request->nik,
+                'name' => $request->name,
+            ]);
+            
+            // Update password jika diisi
+            if ($request->password) {
+                $user->update(['password' => Hash::make($request->password)]);
+            }
+
+            // Update atau buat data pendamping
+            $user->pendamping()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'no_hp' => $request->no_hp,
+                    'alamat' => $request->alamat,
+                    'wilayah_kerja' => $request->wilayah_kerja,
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data pendamping berhasil diperbarui!'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function toggleStatus($id)
+    {
+        // Check role admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        try {
+            $user = User::findOrFail($id);
+            $pendamping = $user->pendamping;
+            
+            if (!$pendamping) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data pendamping tidak ditemukan'
+                ], 404);
+            }
+            
+            $newStatus = $pendamping->status === 'active' ? 'inactive' : 'active';
+            $pendamping->update(['status' => $newStatus]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Status pendamping berhasil diubah menjadi ' . $newStatus
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        // Check role admin
+        if (!auth()->check() || auth()->user()->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        try {
+            $user = User::findOrFail($id);
+            
+            // Cek apakah pendamping masih memiliki penerima aktif
+            if ($user->pendamping) {
+                $activePenerima = Pendaftaran::where('pendamping_id', $user->pendamping->id)
+                    ->where('status', 'approved')
+                    ->count();
+                    
+                if ($activePenerima > 0) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Tidak dapat menghapus pendamping yang masih memiliki penerima aktif'
+                    ], 400);
+                }
+                
+                // Hapus data pendamping terlebih dahulu
+                $user->pendamping->delete();
+            }
+            
+            // Hapus user
+            $user->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Pendamping berhasil dihapus'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
