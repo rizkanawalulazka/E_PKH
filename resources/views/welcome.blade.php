@@ -26,9 +26,13 @@
                         <li><a href="#manfaat" class="text-slate-300 hover:text-blue-400 transition-colors">Manfaat</a></li>
                         <li><a href="#kontak" class="text-slate-300 hover:text-blue-400 transition-colors">Kontak</a></li>
                         <li>
+                            <a href="{{ route('register') }}" 
+                                class="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-blue-600 transform hover:scale-105 transition-all duration-300 shadow-lg">
+                                Daftar
+                            </a>
                             <a href="{{ url('login') }}" 
                                class="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-blue-600 transform hover:scale-105 transition-all duration-300 shadow-lg">
-                                Login
+                                Masuk
                             </a>
                         </li>
                     </ul>

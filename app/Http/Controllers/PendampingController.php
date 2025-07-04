@@ -9,6 +9,7 @@ use App\Models\LaporanPendampingan;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pendaftaran;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class PendampingController extends Controller
 {
@@ -486,4 +487,51 @@ class PendampingController extends Controller
         }
     }
 
+    public function pemantauanPKH()
+    {
+        $user = Auth::user();
+        $pendampingProfile = $user->pendamping;
+
+        if (!$pendampingProfile) {
+            return redirect()->route('dashboard')->with('error', 'Profile pendamping tidak ditemukan');
+        }
+
+        // Ambil data penerima yang sudah disetujui untuk pemantauan
+        $penerima = User::where('role', 'penerima')
+            ->whereHas('pendaftaran', function($query) use ($pendampingProfile) {
+                $query->where('pendamping_id', $pendampingProfile->id)
+                      ->where('status', 'approved');
+            })
+            ->with(['pendaftaran', 'pencairanDana', 'absensiPertemuan'])
+            ->get();
+
+        return view('pendamping.pemantauanPKH', [
+            'penerima' => $penerima,
+            'pendampingProfile' => $pendampingProfile
+        ]);
+    }
+
+    public function detailPemantauan($id)
+    {
+        $user = Auth::user();
+        $pendampingProfile = $user->pendamping;
+
+        $penerima = User::with(['pendaftaran', 'pencairanDana', 'absensiPertemuan', 'laporanBulanan'])
+                       ->findOrFail($id);
+        
+        // Pastikan penerima ini adalah tanggung jawab pendamping yang login
+        $isPenerimaValid = $penerima->pendaftaran()
+            ->where('pendamping_id', $pendampingProfile->id)
+            ->where('status', 'approved')
+            ->exists();
+
+        if (!$isPenerimaValid) {
+            abort(403, 'Unauthorized - Penerima bukan tanggung jawab Anda');
+        }
+
+        $tahunSekarang = Carbon::now()->year;
+        $bulanSekarang = Carbon::now()->month;
+
+        return view('pendamping.detail-pemantauan', compact('penerima', 'tahunSekarang', 'bulanSekarang'));
+    }
 }

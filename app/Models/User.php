@@ -44,7 +44,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Relasi ke model Pendamping
+     * Relationship dengan model Pendamping
      */
     public function pendamping()
     {
@@ -52,11 +52,35 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi ke model Pendaftaran untuk penerima
+     * Relationship dengan model Pendaftaran
      */
     public function pendaftaran()
     {
-        return $this->hasMany(Pendaftaran::class, 'user_id');
+        return $this->hasMany(Pendaftaran::class);
+    }
+
+    /**
+     * Relationship dengan model PencairanDana - TAMBAHKAN INI
+     */
+    public function pencairanDana()
+    {
+        return $this->hasMany(PencairanDana::class);
+    }
+
+    /**
+     * Relationship dengan model AbsensiPertemuan - TAMBAHKAN INI
+     */
+    public function absensiPertemuan()
+    {
+        return $this->hasMany(AbsensiPertemuan::class);
+    }
+
+    /**
+     * Relationship dengan model LaporanBulanan - TAMBAHKAN INI
+     */
+    public function laporanBulanan()
+    {
+        return $this->hasMany(LaporanBulanan::class);
     }
 
     /**

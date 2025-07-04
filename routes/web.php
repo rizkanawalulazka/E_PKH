@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PendampingController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\PemantauanController;
 
 // Public routes
 Route::get('/', function () {
@@ -38,14 +39,19 @@ Route::middleware(['auth'])->group(function () {
 
     // Pendamping routes
     Route::get('/pendamping', [PendampingController::class, 'index'])->name('pendamping.index');
-    Route::get('/pendamping/penerima', [PendampingController::class, 'daftarPenerima'])->name('pendamping.penerima');
+    Route::get('/pendamping/daftar-penerima', [PendampingController::class, 'daftarPenerima'])->name('pendamping.penerima');
+    
+    // Route untuk pemantauan PKH
+    Route::get('/pendamping/pemantauan', [PendampingController::class, 'pemantauanPKH'])->name('pendamping.pemantauan');
+    Route::get('/pendamping/pemantauan/{id}', [PendampingController::class, 'detailPemantauan'])->name('pemantauan.show');
+    
+    // Route untuk laporan pendampingan
     Route::get('/pendamping/laporan', [PendampingController::class, 'daftarLaporan'])->name('pendamping.laporan');
-    Route::get('/pendamping/laporan/buat/{penerima_id}', [PendampingController::class, 'buatLaporan'])->name('pendamping.laporan.buat');
-    Route::post('/pendamping/laporan', [PendampingController::class, 'simpanLaporan'])->name('pendamping.laporan.simpan');
-    Route::post('/pendamping/laporan/{id}/approve', [PendampingController::class, 'approveLaporan'])->name('pendamping.laporan.approve');
-    Route::post('/pendamping/laporan/{id}/reject', [PendampingController::class, 'rejectLaporan'])->name('pendamping.laporan.reject');
-    Route::get('/pendamping/info', [PendampingController::class, 'infoPendamping'])->name('pendamping.info');
-    Route::post('/pendamping/penerima/{penerima_id}/update-status', [PendampingController::class, 'updatePenerimaReportStatus'])->name('pendamping.penerima.update_status');
+    Route::get('/pendamping/laporan/create', [PendampingController::class, 'createLaporan'])->name('pendamping.laporan.create');
+    Route::post('/pendamping/laporan/store', [PendampingController::class, 'storeLaporan'])->name('pendamping.laporan.store');
+    
+    // Route untuk update status penerima
+    Route::post('/pendamping/update-status/{id}', [PendampingController::class, 'updateStatus'])->name('pendamping.update-status');
 
     Route::post('/admin/pendaftaran/{id}/update-status', [PendaftaranController::class, 'updateStatusPendaftaran'])->name('admin.pendaftaran.update-status');
     
@@ -56,6 +62,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/pendamping/{id}/toggle-status', [PendampingController::class, 'toggleStatus'])->name('pendamping.toggle-status');
     Route::delete('/admin/pendamping/{id}/delete', [PendampingController::class, 'destroy'])->name('pendamping.destroy');
     Route::get('/admin/pendamping/export', [PendampingController::class, 'export'])->name('pendamping.export');
+
+    // Routes untuk Pemantauan (hanya untuk pendamping)
+    Route::middleware(['auth', 'role:pendamping'])->group(function () {
+        Route::get('/pemantauan', [PemantauanController::class, 'index'])->name('pemantauan.index');
+        Route::get('/pemantauan/{id}', [PemantauanController::class, 'show'])->name('pemantauan.show');
+        Route::post('/pemantauan/{id}/pencairan', [PemantauanController::class, 'updatePencairan'])->name('pemantauan.update-pencairan');
+        Route::post('/pemantauan/{id}/absensi', [PemantauanController::class, 'updateAbsensi'])->name('pemantauan.update-absensi');
+        Route::post('/pemantauan/{id}/laporan', [PemantauanController::class, 'updateLaporan'])->name('pemantauan.update-laporan');
+    });
 });
 
 
