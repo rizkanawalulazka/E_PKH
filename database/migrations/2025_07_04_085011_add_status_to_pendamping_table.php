@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pendaftaran', function (Blueprint $table) {
-            //
+        Schema::table('pendamping', function (Blueprint $table) {
+            $table->string('status')->default('aktif');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pendaftaran', function (Blueprint $table) {
-            //
+        Schema::table('pendamping', function (Blueprint $table) {
+            $table->dropColumn('status');
         });
     }
 };

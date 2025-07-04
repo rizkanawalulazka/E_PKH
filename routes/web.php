@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PendampingController;
 use App\Http\Controllers\PendaftaranController;
+use App\Http\Controllers\AdminDashboardController;
 
 // Public routes
 Route::get('/', function () {
@@ -21,7 +22,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Protected routes (perlu login)
 Route::middleware(['auth'])->group(function () {
     // Dashboard route
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', function () {
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            return app(AdminDashboardController::class)->index();
+        }
+        return view('dashboard');
+    })->middleware(['auth'])->name('dashboard');
 
     // PKH Registration routes
     Route::get('/pendaftaran', [PendaftaranController::class, 'index'])->name('pendaftaran.pkh.index');

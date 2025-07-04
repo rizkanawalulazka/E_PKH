@@ -23,13 +23,7 @@ class PendampingController extends Controller
 
         // Jika user adalah pendamping atau admin, tampilkan daftar pendamping
         if ($user->role === 'pendamping' || $user->role === 'admin') {
-            $pendampings = User::where('role', 'pendamping')
-                ->with(['pendamping' => function($query) {
-                    $query->withCount(['pendaftaran' => function($subQuery) {
-                        $subQuery->where('status', 'approved');
-                    }]);
-                }])
-                ->get();
+            $pendampings = Pendamping::with('user')->get();
                 
             return view('pendamping.daftar-pendamping', [
                 'pendampings' => $pendampings,

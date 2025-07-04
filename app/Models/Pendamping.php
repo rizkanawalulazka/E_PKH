@@ -22,7 +22,7 @@ class Pendamping extends Model
     // Relasi ke User
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // Relasi ke Pendaftaran (one-to-many)
