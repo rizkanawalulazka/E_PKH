@@ -15,7 +15,6 @@
                     <p class="text-sm text-gray-600">{{ $pendamping->user->name }} - {{ $pendamping->wilayah_kerja }}</p>
                 </div>
             </div>
-          
         </div>
 
         <!-- Info Pendamping dan Statistik -->
@@ -27,7 +26,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Total Penerima</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $pendaftaran->count() }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $totalPenerima }}</p>
                     </div>
                 </div>
             </div>
@@ -39,8 +38,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Penerima Aktif</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $pendaftaran->where('status', 'approved')->count() }}
-                        </p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $penerimaAktif }}</p>
                     </div>
                 </div>
             </div>
@@ -52,8 +50,8 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Pendaftaran Bulan Ini</p>
-                        <p class="text-2xl font-bold text-gray-900">
-                            {{ $pendaftaran->where('created_at', '>=', now()->startOfMonth())->count() }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $pendaftaranBulanIni }}</p>
+                        <p class="text-xs text-gray-500">{{ now()->format('F Y') }}</p>
                     </div>
                 </div>
             </div>
@@ -72,28 +70,20 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-lg font-semibold text-gray-900">Data Penerima PKH</h2>
+                <p class="text-sm text-gray-500 mt-1">Total: {{ $totalPenerima }} penerima</p>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIK
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Alamat</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No HP
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Komponen</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Tanggal Daftar</th>
-
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIK</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alamat</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No HP</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Komponen</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Daftar</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -131,8 +121,7 @@
                                                 $komponenArray = is_array($daftar->komponen) ? $daftar->komponen : explode(', ', $daftar->komponen);
                                             @endphp
                                             @foreach($komponenArray as $komponen)
-                                                <span
-                                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                     {{ ucfirst(str_replace('_', ' ', $komponen)) }}
                                                 </span>
                                             @endforeach
@@ -147,21 +136,24 @@
                                             'rejected' => 'bg-red-100 text-red-800'
                                         ];
                                     @endphp
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$daftar->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$daftar->status] ?? 'bg-gray-100 text-gray-800' }}">
                                         {{ ucfirst($daftar->status) }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ \Carbon\Carbon::parse($daftar->created_at)->format('d M Y') }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-
+                                    {{-- Tampilkan badge jika pendaftaran bulan ini --}}
+                                    @if(\Carbon\Carbon::parse($daftar->created_at)->isCurrentMonth())
+                                        <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="fas fa-star text-xs mr-1"></i>
+                                            Baru
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-6 py-8 text-center text-sm text-gray-500">
+                                <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">
                                     <div class="flex flex-col items-center">
                                         <i class="fas fa-users text-gray-300 text-4xl mb-3"></i>
                                         <p>Belum ada penerima yang didampingi</p>
@@ -187,8 +179,7 @@
             </div>
             <div class="px-6 py-4 border-t border-gray-200">
                 <div class="flex justify-end">
-                    <button onclick="closeModal()"
-                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                    <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
                         Tutup
                     </button>
                 </div>

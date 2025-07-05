@@ -14,9 +14,11 @@ class Pendamping extends Model
     protected $fillable = [
         'user_id',
         'nama_lengkap',
+        'nip',
         'no_hp',
         'alamat',
-        'wilayah_kerja'
+        'wilayah_kerja',
+        'status'
     ];
 
     // Relasi ke User
@@ -28,7 +30,7 @@ class Pendamping extends Model
     // Relasi ke Pendaftaran (one-to-many)
     public function pendaftaran()
     {
-        return $this->hasMany(Pendaftaran::class);
+        return $this->hasMany(Pendaftaran::class, 'pendamping_id');
     }
 
     // Method helper untuk menghitung jumlah penerima aktif

@@ -185,24 +185,32 @@ class PendampingController extends Controller
             return redirect()->route('dashboard')->with('error', 'Profil pendamping tidak ditemukan.');
         }
 
-        // PERBAIKAN: Gunakan kolom 'tanggal' bukan 'tanggal_kunjungan'
-        $laporans = LaporanPendampingan::with(['pendamping.user', 'penerima'])
-            ->where('pendamping_id', $pendampingProfile->id)
-            ->orderBy('tanggal', 'desc')
-            ->get();
-
-        // PERBAIKAN: Tambahkan kolom pendamping_id ke tabel pendaftaran jika belum ada
+        // Ambil semua pendaftaran yang didampingi
         $pendaftaran = \App\Models\Pendaftaran::where('pendamping_id', $pendampingProfile->id)
             ->where('status', 'approved')
             ->with('user')
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // PERBAIKAN: Hitung statistik di controller
+        $totalPenerima = $pendaftaran->count();
+        $penerimaAktif = $pendaftaran->where('status', 'approved')->count();
+        
+        // Hitung pendaftaran bulan ini
+        $pendaftaranBulanIni = \App\Models\Pendaftaran::where('pendamping_id', $pendampingProfile->id)
+            ->where('status', 'approved')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
         return view('pendamping.daftar-laporan', [
             'title' => 'Daftar Laporan Pendampingan',
             'pendaftaran' => $pendaftaran,
             'pendamping' => $pendampingProfile,
-            'user' => $user
+            'user' => $user,
+            'totalPenerima' => $totalPenerima,
+            'penerimaAktif' => $penerimaAktif,
+            'pendaftaranBulanIni' => $pendaftaranBulanIni
         ]);
     }
 

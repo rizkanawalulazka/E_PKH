@@ -43,13 +43,32 @@
             </div>
 
             <nav class="mt-8">
-                <div class="px-4 space-y-2" @auth @if(auth()->user()->role == 'admin') <!-- Data Pendaftaran PKH (Admin)
-                        -->
+                <div class="px-4 space-y-2" @auth @if(auth()->user()->role == 'admin') -->
+                        <a href="{{ route('dashboard') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('dashboard') ? 'bg-slate-700' : '' }}">
+                            <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                            Dashboard
+                        </a>
                         <a href="{{ route('pendaftaran.pkh.index') }}"
                             class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('pendaftaran.pkh.index') ? 'bg-slate-700' : '' }}">
                             <i class="fas fa-table w-5 h-5 mr-3"></i>
                             Data Pendaftaran PKH
                         </a>
+                        <!-- Daftar Penerima (bukan Daftar Pendamping) -->
+                        <a href="{{ route('pendamping.penerima') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('pendamping.penerima') ? 'bg-slate-700' : '' }}">
+                            <i class="fas fa-users w-5 h-5 mr-3"></i>
+                            Daftar Pendamping
+                        </a>
+
+                        <!-- Pemantauan PKH -->
+                        <a href="{{ route('pendamping.pemantauan') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('pendamping.pemantauan') || request()->routeIs('pemantauan.show') ? 'bg-slate-700' : '' }}">
+                            <i class="fas fa-clipboard-check w-5 h-5 mr-3"></i>
+                            Pemantauan PKH
+                        </a>
+
+
                     @endif
                 @endauth
 

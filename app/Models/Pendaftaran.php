@@ -25,7 +25,8 @@ class Pendaftaran extends Model
         'foto_rumah',
         'status',
         'catatan_admin',
-        'approved_at'
+        'approved_at',
+         'pendamping_id'
     ];
 
     protected $casts = [
@@ -37,5 +38,10 @@ class Pendaftaran extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function pendamping()
+    {
+        return $this->belongsTo(Pendamping::class, 'pendamping_id');
     }
 }

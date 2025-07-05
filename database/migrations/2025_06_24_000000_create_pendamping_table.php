@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('nama_lengkap');
+            $table->string('nip')->unique();
             $table->string('no_hp');
             $table->text('alamat');
             $table->string('wilayah_kerja');

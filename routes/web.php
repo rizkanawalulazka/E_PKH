@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -27,12 +26,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
 
-        if ($user->role === 'admin') {
-            return app(AdminDashboardController::class)->index();
-        } elseif ($user->role === 'pendamping') {
-            return app(PendampingController::class)->index(); // REDIRECT KE PENDAMPING INDEX
-        } else {
-            return view('dashboard'); // Default dashboard untuk penerima
+        switch ($user->role) {
+            case 'admin':
+                return app(AdminDashboardController::class)->index();
+
+            case 'pendamping':
+                return app(PendampingController::class)->index();
+
+            default:
+                // Untuk role penerima dan role lainnya
+                return app(DashboardController::class)->index();
         }
     })->name('dashboard');
 
@@ -45,11 +48,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pendaftaran/{id}/approve', [PendaftaranController::class, 'approve'])->name('pendaftaran.pkh.approve');
     Route::post('/pendaftaran/{id}/reject', [PendaftaranController::class, 'reject'])->name('pendaftaran.pkh.reject');
 
+    // TAMBAHKAN ROUTE YANG HILANG
+    Route::post('/pendaftaran/{id}/update-status', [PendaftaranController::class, 'updateStatus'])->name('pendaftaran.update-status');
+    Route::post('/pendaftaran/{id}/assign-pendamping', [PendaftaranController::class, 'assignPendampingManual'])->name('pendaftaran.assign-pendamping');
+    Route::get('/pendaftaran/{id}/detail', [PendaftaranController::class, 'getDetail'])->name('pendaftaran.detail');
+
     // Pendamping routes
     Route::get('/pendamping', [PendampingController::class, 'index'])->name('pendamping.index');
     Route::get('/pendamping/daftar-penerima', [PendampingController::class, 'daftarPenerima'])->name('pendamping.penerima');
 
-    // Route untuk pemantauan PKH - GUNAKAN PEMANTAUANCONTROLLER
+    // Route untuk pemantauan PKH
     Route::get('/pendamping/pemantauan', [PemantauanController::class, 'index'])->name('pendamping.pemantauan');
     Route::get('/pendamping/pemantauan/{id}', [PemantauanController::class, 'show'])->name('pemantauan.show');
 
@@ -71,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/pendamping/{id}/delete', [PendampingController::class, 'destroy'])->name('pendamping.destroy');
     Route::get('/admin/pendamping/export', [PendampingController::class, 'export'])->name('pendamping.export');
 
-    // Routes untuk Pemantauan - HAPUS MIDDLEWARE ROLE
+    // Routes untuk Pemantauan
     Route::get('/pemantauan', [PemantauanController::class, 'index'])->name('pemantauan.index');
     Route::get('/pemantauan/{id}', [PemantauanController::class, 'show'])->name('pemantauan.show');
     Route::post('/pemantauan/{id}/pencairan', [PemantauanController::class, 'updatePencairan'])->name('pemantauan.update-pencairan');

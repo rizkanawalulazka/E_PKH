@@ -1,4 +1,4 @@
-@extends('layouts.app', ['pendampingRandom' => $pendampingRandom ?? null])
+@extends('layouts.app')
 
 @section('title', 'Dashboard')
 
@@ -12,13 +12,7 @@
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
             </div>
-            @if(auth()->user()->role === 'penerima')
-                <a href="/pendaftaran/create"
-                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-plus mr-2"></i>
-                    Daftar PKH Baru
-                </a>
-            @endif
+         
         </div>
 
         <!-- Stats Cards -->
@@ -27,11 +21,21 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Total Bantuan (2024)</p>
-                        <p class="text-2xl font-bold text-gray-900 mt-2">Rp306.500.000</p>
+                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">
+                            Total Bantuan ({{ date('Y') }})
+                        </p>
+                        <p class="text-2xl font-bold text-gray-900 mt-2">
+                            Rp {{ number_format($totalBantuanTahunIni, 0, ',', '.') }}
+                        </p>
                     </div>
                     <div class="p-3 bg-blue-100 rounded-full">
                         <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Total pencairan tahun ini
                     </div>
                 </div>
             </div>
@@ -40,12 +44,21 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Rata-rata Bantuan (Bulanan)
+                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">
+                            Rata-rata Bantuan (Bulanan)
                         </p>
-                        <p class="text-2xl font-bold text-gray-900 mt-2">Rp25.541.667</p>
+                        <p class="text-2xl font-bold text-gray-900 mt-2">
+                            Rp {{ number_format($rataBantuanBulanan, 0, ',', '.') }}
+                        </p>
                     </div>
                     <div class="p-3 bg-green-100 rounded-full">
                         <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-chart-line mr-1"></i>
+                        Per bulan di {{ date('Y') }}
                     </div>
                 </div>
             </div>
@@ -55,10 +68,16 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Jumlah Penerima</p>
-                        <p class="text-2xl font-bold text-gray-900 mt-2">150</p>
+                        <p class="text-2xl font-bold text-gray-900 mt-2">{{ $totalPenerima }}</p>
                     </div>
                     <div class="p-3 bg-cyan-100 rounded-full">
                         <i class="fas fa-users text-cyan-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        Penerima aktif
                     </div>
                 </div>
             </div>
@@ -68,15 +87,78 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 uppercase tracking-wider">Pengajuan Pending</p>
-                        <p class="text-2xl font-bold text-gray-900 mt-2">18</p>
+                        <p class="text-2xl font-bold text-gray-900 mt-2">{{ $pendingPengajuan }}</p>
                     </div>
                     <div class="p-3 bg-yellow-100 rounded-full">
-                        <i class="fas fa-comments text-yellow-600 text-xl"></i>
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        Menunggu persetujuan
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Additional Cards untuk Penerima -->
+        @if(auth()->user()->role === 'penerima' && isset($additionalData['total_diterima']))
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="p-2 bg-green-100 rounded-lg mr-3">
+                        <i class="fas fa-wallet text-green-600 text-xl"></i>
+                    </div>
+                    <h2 class="text-lg font-semibold text-gray-900">Status Bantuan Anda</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600">Total Bantuan Diterima</div>
+                        <div class="text-2xl font-bold text-green-600">
+                            Rp {{ number_format($additionalData['total_diterima'], 0, ',', '.') }}
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600">Status Pendaftaran</div>
+                        <div class="text-lg font-semibold text-blue-600">
+                            @if($additionalData['pendaftaran']->isNotEmpty())
+                                {{ ucfirst($additionalData['pendaftaran']->first()->status) }}
+                            @else
+                                Belum Daftar
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Additional Cards untuk Pendamping -->
+        @if(auth()->user()->role === 'pendamping')
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="p-2 bg-purple-100 rounded-lg mr-3">
+                        <i class="fas fa-user-tie text-purple-600 text-xl"></i>
+                    </div>
+                    <h2 class="text-lg font-semibold text-gray-900">Ringkasan Pendampingan</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-purple-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600">Jumlah Penerima</div>
+                        <div class="text-2xl font-bold text-purple-600">
+                            {{ $additionalData['jumlah_penerima'] ?? 0 }}
+                        </div>
+                    </div>
+                    <div class="bg-indigo-50 rounded-lg p-4">
+                        <div class="text-sm text-gray-600">Pencairan Bulan Ini</div>
+                        <div class="text-lg font-semibold text-indigo-600">
+                            Rp {{ number_format($additionalData['pencairan_bulan_ini'] ?? 0, 0, ',', '.') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Besaran Bantuan PKH -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center mb-6">
                 <div class="p-2 bg-green-100 rounded-lg mr-3">
@@ -134,8 +216,7 @@
                     <span class="text-sm font-bold text-gray-700">Rp 2.400.000</span>
                 </div>
 
-                <div
-                    class="flex items-center justify-between p-4 bg-indigo-50 rounded-lg border border-indigo-200 md:col-span-2 lg:col-span-1">
+                <div class="flex items-center justify-between p-4 bg-indigo-50 rounded-lg border border-indigo-200 md:col-span-2 lg:col-span-1">
                     <div class="flex items-center">
                         <i class="fas fa-wheelchair text-indigo-600 mr-3"></i>
                         <span class="text-sm font-medium text-gray-800">Penyandang Disabilitas Berat</span>
@@ -150,7 +231,7 @@
             <!-- Bar Chart -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Data Bantuan Bulanan (2024)</h2>
+                    <h2 class="text-lg font-semibold text-gray-900">Data Bantuan Bulanan ({{ date('Y') }})</h2>
                 </div>
                 <div class="h-80">
                     <canvas id="bantuanBarChart"></canvas>
@@ -168,15 +249,15 @@
                 <div class="flex items-center justify-center space-x-6 mt-4">
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                        <span class="text-sm text-gray-600">Kesehatan</span>
+                        <span class="text-sm text-gray-600">Kesehatan ({{ $komponenData['Kesehatan'] ?? 0 }})</span>
                     </div>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                        <span class="text-sm text-gray-600">Pendidikan</span>
+                        <span class="text-sm text-gray-600">Pendidikan ({{ $komponenData['Pendidikan'] ?? 0 }})</span>
                     </div>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-cyan-500 rounded-full mr-2"></div>
-                        <span class="text-sm text-gray-600">Kesejahteraan Sosial</span>
+                        <span class="text-sm text-gray-600">Kesejahteraan Sosial ({{ $komponenData['Kesejahteraan Sosial'] ?? 0 }})</span>
                     </div>
                 </div>
             </div>
@@ -186,6 +267,10 @@
 
 @section('scripts')
     <script>
+        // Data dari backend
+        const bantuanPerBulan = @json($bantuanPerBulan);
+        const komponenData = @json($komponenData);
+
         // Pie Chart
         var ctx = document.getElementById("pkhPieChart");
         var pkhPieChart = new Chart(ctx, {
@@ -193,7 +278,11 @@
             data: {
                 labels: ["Kesehatan", "Pendidikan", "Kesejahteraan Sosial"],
                 datasets: [{
-                    data: [35, 45, 20],
+                    data: [
+                        komponenData['Kesehatan'] || 0,
+                        komponenData['Pendidikan'] || 0,
+                        komponenData['Kesejahteraan Sosial'] || 0
+                    ],
                     backgroundColor: ['#3B82F6', '#10B981', '#06B6D4'],
                     hoverBackgroundColor: ['#2563EB', '#059669', '#0891B2'],
                     borderWidth: 0,
@@ -209,7 +298,9 @@
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                return context.label + ': ' + context.parsed + '%';
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((context.parsed / total) * 100) : 0;
+                                return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
                             }
                         }
                     }
@@ -226,7 +317,7 @@
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
                 datasets: [{
                     label: 'Bantuan (Juta Rupiah)',
-                    data: [25, 30, 22, 28, 35, 20, 40, 32, 28, 25, 30, 35],
+                    data: bantuanPerBulan,
                     backgroundColor: '#3B82F6',
                     borderColor: '#2563EB',
                     borderWidth: 1,
@@ -239,6 +330,13 @@
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Bantuan: Rp ' + (context.parsed.y * 1000000).toLocaleString('id-ID');
+                            }
+                        }
                     }
                 },
                 scales: {
@@ -246,6 +344,11 @@
                         beginAtZero: true,
                         grid: {
                             color: '#F3F4F6'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + 'M';
+                            }
                         }
                     },
                     x: {
