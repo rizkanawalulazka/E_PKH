@@ -39,34 +39,8 @@
             </div>
             
             <nav class="mt-8">
-                <div class="px-4 space-y-2">
-                    <!-- Dashboard -->
-                    <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('dashboard') ? 'bg-slate-700' : '' }}">
-                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
-                        Dashboard
-                    </a>
+                <div class="px-4 space-y-2"
                     
-                    @auth
-                        @if(auth()->user()->role == 'pendamping' || auth()->user()->role == 'admin')
-                            <!-- Daftar Pendamping -->
-                            <a href="{{ route('pendamping.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('pendamping.index') ? 'bg-slate-700' : '' }}">
-                                <i class="fas fa-user-friends w-5 h-5 mr-3"></i>
-                                Daftar Pendamping
-                            </a>
-                            
-                            <!-- Laporan -->
-                            <a href="{{ route('pendamping.laporan') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('pendamping.laporan') ? 'bg-slate-700' : '' }}">
-                                <i class="fas fa-clipboard-list w-5 h-5 mr-3"></i>
-                                Laporan Pendampingan
-                            </a>
-                            
-                            <!-- Daftar Penerima -->
-                            <a href="{{ route('pendamping.penerima') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('pendamping.penerima') ? 'bg-slate-700' : '' }}">
-                                <i class="fas fa-users w-5 h-5 mr-3"></i>
-                                Daftar Penerima
-                            </a>
-                        @endif
-                    @endauth
                     
                     @auth
                         @if(auth()->user()->role == 'admin')
@@ -80,6 +54,11 @@
                     
                     @auth
                         @if(auth()->user()->role == 'penerima')
+                            <!-- Dashboard -->
+                            <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('dashboard') ? 'bg-slate-700' : '' }}">
+                            <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                                Dashboard
+                            </a>
                             <!-- Daftar PKH -->
                             <a href="/pendaftaran/create" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors">
                                 <i class="fas fa-table w-5 h-5 mr-3"></i>
@@ -108,10 +87,10 @@
                                 Dashboard Pendamping
                             </a>
                             
-                            <!-- Daftar Penerima -->
+                            <!-- Daftar Pendamping -->
                             <a href="{{ route('pendamping.penerima') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors {{ request()->routeIs('pendamping.penerima') ? 'bg-slate-700' : '' }}">
                                 <i class="fas fa-users w-5 h-5 mr-3"></i>
-                                Daftar Penerima
+                                Daftar Pendamping
                             </a>
                             
                             <!-- Pemantauan PKH - TAMBAHKAN INI -->

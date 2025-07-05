@@ -55,7 +55,7 @@ class Kernel extends HttpKernel
     ];
 
     /**
-     * Register any other middleware.
+     * Register any other middleware.z
      *
      * @var array<string, class-string|string>
      */
