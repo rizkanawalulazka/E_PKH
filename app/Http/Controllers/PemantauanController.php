@@ -8,41 +8,85 @@ use App\Models\Pendaftaran;
 use App\Models\PencairanDana;
 use App\Models\AbsensiPertemuan;
 use App\Models\LaporanBulanan;
+use App\Models\Pendamping;
 use Carbon\Carbon;
 
 class PemantauanController extends Controller
 {
     public function index()
     {
-        $pendamping = auth()->user();
-        $penerima = User::where('pendamping_id', $pendamping->id)
-                       ->where('role', 'penerima')
-                       ->with(['pendaftaran' => function($query) {
-                           $query->where('status', 'disetujui');
-                       }])
-                       ->get();
+        $user = auth()->user();
+        
+        // Pastikan hanya pendamping yang bisa akses
+        if ($user->role !== 'pendamping') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
 
-        return view('pemantauan.index', compact('penerima'));
+        $pendampingProfile = $user->pendamping;
+        
+        // Ambil penerima yang didampingi oleh pendamping ini
+        $penerima = User::where('role', 'penerima')
+            ->whereHas('pendaftaran', function($query) use ($pendampingProfile) {
+                $query->where('pendamping_id', $pendampingProfile->id)
+                      ->where('status', 'approved'); // Ganti 'disetujui' dengan 'approved'
+            })
+            ->with(['pendaftaran' => function($query) use ($pendampingProfile) {
+                $query->where('pendamping_id', $pendampingProfile->id)
+                      ->where('status', 'approved');
+            }])
+            ->get();
+
+        return view('pendamping.pemantauanPKH', [
+            'penerima' => $penerima,
+            'title' => 'Pemantauan PKH'
+        ]);
     }
 
-    public function show($id)
+    public function show($id)   
     {
-        $penerima = User::with(['pendaftaran', 'pencairanDana', 'absensiPertemuan', 'laporanBulanan'])
-                       ->findOrFail($id);
+        $user = auth()->user();
         
-        // Pastikan penerima ini adalah tanggung jawab pendamping yang login
-        if ($penerima->pendamping_id !== auth()->id()) {
-            abort(403, 'Unauthorized');
+        // Pastikan hanya pendamping yang bisa akses
+        if ($user->role !== 'pendamping') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        $pendampingProfile = $user->pendamping;
+        
+        // Ambil penerima dengan validasi bahwa dia didampingi oleh pendamping ini
+        $penerima = User::where('role', 'penerima')
+            ->where('id', $id)
+            ->whereHas('pendaftaran', function($query) use ($pendampingProfile) {
+                $query->where('pendamping_id', $pendampingProfile->id)
+                      ->where('status', 'approved');
+            })
+            ->with(['pendaftaran', 'pencairanDana', 'absensiPertemuan', 'laporanBulanan'])
+            ->first();
+        
+        if (!$penerima) {
+            abort(403, 'Unauthorized - Penerima tidak ditemukan atau bukan tanggung jawab Anda.');
         }
 
         $tahunSekarang = Carbon::now()->year;
         $bulanSekarang = Carbon::now()->month;
 
-        return view('pemantauan.detail', compact('penerima', 'tahunSekarang', 'bulanSekarang'));
+        return view('pendamping.detail-pemantauan', [
+            'penerima' => $penerima,
+            'tahunSekarang' => $tahunSekarang,
+            'bulanSekarang' => $bulanSekarang,
+            'title' => 'Detail Pemantauan'
+        ]);
     }
 
+    // Method lainnya tetap sama...
     public function updatePencairan(Request $request, $id)
     {
+        $user = auth()->user();
+        
+        if ($user->role !== 'pendamping') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
         $request->validate([
             'periode' => 'required|integer|between:1,4',
             'tahun' => 'required|integer',
@@ -70,6 +114,12 @@ class PemantauanController extends Controller
 
     public function updateAbsensi(Request $request, $id)
     {
+        $user = auth()->user();
+        
+        if ($user->role !== 'pendamping') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
         $request->validate([
             'bulan' => 'required|integer|between:1,12',
             'tahun' => 'required|integer',
@@ -94,6 +144,12 @@ class PemantauanController extends Controller
 
     public function updateLaporan(Request $request, $id)
     {
+        $user = auth()->user();
+        
+        if ($user->role !== 'pendamping') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
         $request->validate([
             'bulan' => 'required|integer|between:1,12',
             'tahun' => 'required|integer',
@@ -114,7 +170,7 @@ class PemantauanController extends Controller
                 'pencapaian_komitmen' => $request->pencapaian_komitmen,
                 'kendala' => $request->kendala,
                 'rekomendasi' => $request->rekomendasi,
-                'pendamping_id' => auth()->id()
+                'pendamping_id' => $user->pendamping->id
             ]
         );
 

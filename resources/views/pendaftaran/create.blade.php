@@ -74,27 +74,90 @@
                 <!-- Komponen Bantuan -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-4">Komponen Bantuan <span class="text-red-500">*</span></label>
-                    <div class="space-y-3">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="komponen_kesehatan" name="komponen[]" value="kesehatan"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <label for="komponen_kesehatan" class="ml-2 block text-sm text-gray-700">
-                                Kesehatan (Ibu Hamil/Balita/Lansia)
-                            </label>
+                    
+                    <!-- Kesehatan -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-heartbeat text-red-500 mr-2"></i>
+                            Kesehatan
+                        </h4>
+                        <div class="ml-6 space-y-2">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="ibu_hamil" name="komponen[]" value="ibu_hamil"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="ibu_hamil" class="ml-2 block text-sm text-gray-700">
+                                    Ibu Hamil
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="balita" name="komponen[]" value="balita"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="balita" class="ml-2 block text-sm text-gray-700">
+                                    Balita (0-5 tahun)
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="lansia" name="komponen[]" value="lansia"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="lansia" class="ml-2 block text-sm text-gray-700">
+                                    Lansia (60+ tahun)
+                                </label>
+                            </div>
                         </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="komponen_pendidikan" name="komponen[]" value="pendidikan"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <label for="komponen_pendidikan" class="ml-2 block text-sm text-gray-700">
-                                Pendidikan (Anak Usia Sekolah)
-                            </label>
+                    </div>
+
+                    <!-- Pendidikan -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-graduation-cap text-blue-500 mr-2"></i>
+                            Pendidikan
+                        </h4>
+                        <div class="ml-6 space-y-2">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="anak_sd" name="komponen[]" value="anak_sd"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="anak_sd" class="ml-2 block text-sm text-gray-700">
+                                    Anak SD/MI (7-12 tahun)
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="anak_smp" name="komponen[]" value="anak_smp"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="anak_smp" class="ml-2 block text-sm text-gray-700">
+                                    Anak SMP/MTs (13-15 tahun)
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="anak_sma" name="komponen[]" value="anak_sma"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="anak_sma" class="ml-2 block text-sm text-gray-700">
+                                    Anak SMA/MA (16-18 tahun)
+                                </label>
+                            </div>
                         </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="komponen_kesejahteraan" name="komponen[]" value="kesejahteraan_sosial"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <label for="komponen_kesejahteraan" class="ml-2 block text-sm text-gray-700">
-                                Kesejahteraan Sosial (Disabilitas Berat)
-                            </label>
+                    </div>
+
+                    <!-- Kesejahteraan Sosial -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-hands-helping text-green-500 mr-2"></i>
+                            Kesejahteraan Sosial
+                        </h4>
+                        <div class="ml-6 space-y-2">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="disabilitas_berat" name="komponen[]" value="disabilitas_berat"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="disabilitas_berat" class="ml-2 block text-sm text-gray-700">
+                                    Disabilitas Berat
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="lanjut_usia" name="komponen[]" value="lanjut_usia"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="lanjut_usia" class="ml-2 block text-sm text-gray-700">
+                                    Lanjut Usia (70+ tahun)
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -183,20 +246,70 @@ $(document).ready(function() {
         }
     });
 
-    // File upload handlers
+    // PERBAIKAN: File upload handlers
     $('input[type="file"]').on('change', function() {
         const file = this.files[0];
-        const parent = $(this).parent();
+        const parent = $(this).closest('.border-dashed');
+        const fileName = parent.find('p').first();
         
         if (file) {
-            parent.find('p').first().text(file.name);
+            // Validasi ukuran file (2MB = 2 * 1024 * 1024 bytes)
+            if (file.size > 2 * 1024 * 1024) {
+                showAlert('error', 'Ukuran file ' + file.name + ' terlalu besar. Maksimal 2MB.');
+                $(this).val(''); // Reset input
+                return;
+            }
+            
+            // Validasi tipe file
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                showAlert('error', 'Tipe file ' + file.name + ' tidak didukung. Gunakan JPG, JPEG, atau PNG.');
+                $(this).val(''); // Reset input
+                return;
+            }
+            
+            // Update UI
+            fileName.text(file.name);
             parent.removeClass('border-gray-300').addClass('border-blue-500 bg-blue-50');
+            
+            // Tambahkan indikator file berhasil dipilih
+            const icon = parent.find('i');
+            icon.removeClass('fa-upload text-gray-400').addClass('fa-check-circle text-green-500');
         }
     });
 
-    // Click handlers for upload areas
-    $('.border-dashed').on('click', function() {
-        $(this).find('input[type="file"]').click();
+    // PERBAIKAN: Click handlers untuk upload areas
+    $('.border-dashed').on('click', function(e) {
+        // Hindari double click jika sudah mengklik input
+        if (e.target.type !== 'file') {
+            $(this).find('input[type="file"]').click();
+        }
+    });
+
+    // Prevent default drag behaviors
+    $('.border-dashed').on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    // Handle drag over
+    $('.border-dashed').on('dragover dragenter', function() {
+        $(this).addClass('border-blue-500 bg-blue-50');
+    });
+
+    // Handle drag leave
+    $('.border-dashed').on('dragleave dragend drop', function() {
+        $(this).removeClass('border-blue-500 bg-blue-50');
+    });
+
+    // Handle file drop
+    $('.border-dashed').on('drop', function(e) {
+        const files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            const fileInput = $(this).find('input[type="file"]')[0];
+            fileInput.files = files;
+            $(fileInput).trigger('change');
+        }
     });
 
     // Form validation and submission
@@ -216,7 +329,7 @@ $(document).ready(function() {
             data: formData,
             processData: false,
             contentType: false,
-            timeout: 30000,
+            timeout: 60000, // Increase timeout untuk upload file
             xhr: function() {
                 const xhr = new window.XMLHttpRequest();
                 xhr.upload.addEventListener("progress", function(evt) {
@@ -253,6 +366,8 @@ $(document).ready(function() {
                         errorMessage += '</ul>';
                         showAlert('error', errorMessage);
                     }
+                } else if (xhr.status === 413) {
+                    showAlert('error', 'File terlalu besar. Maksimal 2MB per file.');
                 } else {
                     showAlert('error', 'Terjadi kesalahan sistem. Silakan coba lagi.');
                 }
@@ -300,12 +415,15 @@ $(document).ready(function() {
         }
 
         // Validate files
-        if (!$('#kartu_keluarga')[0].files.length) {
+        const kkFile = $('#kartu_keluarga')[0].files[0];
+        const rumahFile = $('#foto_rumah')[0].files[0];
+        
+        if (!kkFile) {
             errorMessage += 'Kartu keluarga wajib diunggah.<br>';
             isValid = false;
         }
 
-        if (!$('#foto_rumah')[0].files.length) {
+        if (!rumahFile) {
             errorMessage += 'Foto rumah wajib diunggah.<br>';
             isValid = false;
         }
@@ -353,7 +471,12 @@ $(document).ready(function() {
 
     function resetFileUploads() {
         $('.border-dashed').removeClass('border-blue-500 bg-blue-50').addClass('border-gray-300');
-        $('.border-dashed p').first().text('Klik untuk upload');
+        $('.border-dashed p').first().each(function() {
+            if ($(this).hasClass('text-gray-600')) {
+                $(this).text($(this).text().includes('Kartu') ? 'Klik untuk upload Kartu Keluarga' : 'Klik untuk upload Foto Rumah');
+            }
+        });
+        $('.border-dashed i').removeClass('fa-check-circle text-green-500').addClass('fa-upload text-gray-400');
     }
 
     // Input formatting

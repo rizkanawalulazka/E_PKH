@@ -17,43 +17,21 @@ class PendampingController extends Controller
     {
         $user = Auth::user();
 
-        // Jika user adalah penerima, redirect ke dashboard
-        if ($user->role === 'penerima') {
-            return redirect()->route('dashboard');
-        }
-
-        // Jika user adalah pendamping atau admin, tampilkan daftar pendamping
-        if ($user->role === 'pendamping' || $user->role === 'admin') {
-            $pendampings = Pendamping::with('user')->get();
-                
-            return view('pendamping.daftar-pendamping', [
-                'pendampings' => $pendampings,
-                'title' => 'Daftar Pendamping',
-                'menuPendampingList' => 'active',
-            ]);
-        }
-
-        // Default fallback
-        return redirect()->route('dashboard');
-    }
-
-    public function daftarPenerima()
-    {
-        $user = Auth::user();
-        
         if ($user->role === 'pendamping') {
             $pendampingProfile = $user->pendamping;
-            
+
             // Ambil penerima yang didampingi oleh pendamping ini
             $penerima = User::where('role', 'penerima')
-                ->whereHas('pendaftaran', function($query) use ($pendampingProfile) {
+                ->whereHas('pendaftaran', function ($query) use ($pendampingProfile) {
                     $query->where('pendamping_id', $pendampingProfile->id)
-                          ->where('status', 'approved');
+                        ->where('status', 'approved');
                 })
-                ->with(['pendaftaran' => function($query) use ($pendampingProfile) {
-                    $query->where('pendamping_id', $pendampingProfile->id)
-                          ->where('status', 'approved');
-                }])
+                ->with([
+                    'pendaftaran' => function ($query) use ($pendampingProfile) {
+                        $query->where('pendamping_id', $pendampingProfile->id)
+                            ->where('status', 'approved');
+                    }
+                ])
                 ->get();
 
             // Tambahkan status laporan untuk setiap penerima
@@ -68,13 +46,13 @@ class PendampingController extends Controller
 
             // Data statistik pendamping
             $totalPenerima = $penerima->count();
-            $penerimaSelesai = $penerima->filter(function($p) {
+            $penerimaSelesai = $penerima->filter(function ($p) {
                 return $p->report_status === 'Selesai';
             })->count();
-            $penerimaProses = $penerima->filter(function($p) {
+            $penerimaProses = $penerima->filter(function ($p) {
                 return $p->report_status === 'Proses';
             })->count();
-            $penerimaBelumDidampingi = $penerima->filter(function($p) {
+            $penerimaBelumDidampingi = $penerima->filter(function ($p) {
                 return is_null($p->report_status);
             })->count();
 
@@ -98,6 +76,29 @@ class PendampingController extends Controller
             'title' => 'Dashboard Pendamping',
             'menuPenerima' => 'active'
         ]);
+    }
+    public function daftarPenerima()
+    {
+        $user = Auth::user();
+
+        // Jika user adalah penerima, redirect ke dashboard
+        if ($user->role === 'penerima') {
+            return redirect()->route('dashboard');
+        }
+
+        // Jika user adalah pendamping atau admin, tampilkan daftar pendamping
+        if ($user->role === 'pendamping' || $user->role === 'admin') {
+            $pendampings = Pendamping::with('user')->get();
+
+            return view('pendamping.daftar-pendamping', [
+                'pendampings' => $pendampings,
+                'title' => 'Daftar Pendamping',
+                'menuPendampingList' => 'active',
+            ]);
+        }
+
+        // Default fallback
+        return redirect()->route('');
     }
 
     public function buatLaporan($penerima_id)
@@ -172,13 +173,36 @@ class PendampingController extends Controller
 
     public function daftarLaporan()
     {
-        $laporan = LaporanPendampingan::with(['pendamping.user', 'penerima'])
+        $user = auth()->user();
+
+        if ($user->role !== 'pendamping') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        $pendampingProfile = $user->pendamping;
+
+        if (!$pendampingProfile) {
+            return redirect()->route('dashboard')->with('error', 'Profil pendamping tidak ditemukan.');
+        }
+
+        // PERBAIKAN: Gunakan kolom 'tanggal' bukan 'tanggal_kunjungan'
+        $laporans = LaporanPendampingan::with(['pendamping.user', 'penerima'])
+            ->where('pendamping_id', $pendampingProfile->id)
             ->orderBy('tanggal', 'desc')
             ->get();
-        
+
+        // PERBAIKAN: Tambahkan kolom pendamping_id ke tabel pendaftaran jika belum ada
+        $pendaftaran = \App\Models\Pendaftaran::where('pendamping_id', $pendampingProfile->id)
+            ->where('status', 'approved')
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('pendamping.daftar-laporan', [
-            'title' => 'Daftar Laporan',
-            'laporan' => $laporan
+            'title' => 'Daftar Laporan Pendampingan',
+            'pendaftaran' => $pendaftaran,
+            'pendamping' => $pendampingProfile,
+            'user' => $user
         ]);
     }
 
@@ -205,7 +229,12 @@ class PendampingController extends Controller
     {
         $user = auth()->user();
 
-        // Cek status pendaftaran berdasarkan user_id (bukan NIK)
+        // Pastikan hanya penerima yang bisa mengakses
+        if ($user->role !== 'penerima') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak. Halaman ini hanya untuk penerima PKH.');
+        }
+
+        // Cek status pendaftaran berdasarkan user_id
         $pendaftaran = \App\Models\Pendaftaran::where('user_id', $user->id)
             ->where('status', 'approved')
             ->with('pendamping.user') // Eager loading pendamping
@@ -214,7 +243,7 @@ class PendampingController extends Controller
 
         $pendamping = null;
 
-        if ($user->role === 'penerima' && $pendaftaran) {
+        if ($pendaftaran) {
             // Ambil pendamping yang sudah ditetapkan dari relasi database
             $pendamping = $pendaftaran->pendamping;
 
@@ -234,8 +263,16 @@ class PendampingController extends Controller
             }
         }
 
-        return view('pendamping.info-pendamping', compact('pendaftaran', 'pendamping'));
+        // Return ke view yang benar dengan data yang diperlukan
+        return view('pendamping.info-pendamping', [
+            'title' => 'Info Pendamping',
+            'pendaftaran' => $pendaftaran,
+            'pendamping' => $pendamping,
+            'user' => $user
+        ]);
     }
+
+
 
     /**
      * Assign pendamping berdasarkan load balancing (pendamping dengan penerima paling sedikit)
@@ -308,14 +345,14 @@ class PendampingController extends Controller
                 'message' => 'Data tidak valid',
                 'errors' => $e->errors()
             ], 422);
-            
+
         } catch (\Exception $e) {
             \Log::error('Error creating pendamping:', [
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
                 'file' => $e->getFile()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan sistem'
@@ -335,7 +372,7 @@ class PendampingController extends Controller
 
         try {
             $user = User::with('pendamping')->findOrFail($id);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $user
@@ -369,13 +406,13 @@ class PendampingController extends Controller
 
         try {
             $user = User::findOrFail($id);
-            
+
             // Update user data
             $user->update([
                 'nik' => $request->nik,
                 'name' => $request->name,
             ]);
-            
+
             // Update password jika diisi
             if ($request->password) {
                 $user->update(['password' => Hash::make($request->password)]);
@@ -417,22 +454,22 @@ class PendampingController extends Controller
         try {
             $user = User::findOrFail($id);
             $pendamping = $user->pendamping;
-            
+
             if (!$pendamping) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Data pendamping tidak ditemukan'
                 ], 404);
             }
-            
+
             $newStatus = $pendamping->status === 'active' ? 'inactive' : 'active';
             $pendamping->update(['status' => $newStatus]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Status pendamping berhasil diubah menjadi ' . $newStatus
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -453,32 +490,32 @@ class PendampingController extends Controller
 
         try {
             $user = User::findOrFail($id);
-            
+
             // Cek apakah pendamping masih memiliki penerima aktif
             if ($user->pendamping) {
                 $activePenerima = Pendaftaran::where('pendamping_id', $user->pendamping->id)
                     ->where('status', 'approved')
                     ->count();
-                    
+
                 if ($activePenerima > 0) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Tidak dapat menghapus pendamping yang masih memiliki penerima aktif'
                     ], 400);
                 }
-                
+
                 // Hapus data pendamping terlebih dahulu
                 $user->pendamping->delete();
             }
-            
+
             // Hapus user
             $user->delete();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Pendamping berhasil dihapus'
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -498,9 +535,9 @@ class PendampingController extends Controller
 
         // Ambil data penerima yang sudah disetujui untuk pemantauan
         $penerima = User::where('role', 'penerima')
-            ->whereHas('pendaftaran', function($query) use ($pendampingProfile) {
+            ->whereHas('pendaftaran', function ($query) use ($pendampingProfile) {
                 $query->where('pendamping_id', $pendampingProfile->id)
-                      ->where('status', 'approved');
+                    ->where('status', 'approved');
             })
             ->with(['pendaftaran', 'pencairanDana', 'absensiPertemuan'])
             ->get();
@@ -517,8 +554,8 @@ class PendampingController extends Controller
         $pendampingProfile = $user->pendamping;
 
         $penerima = User::with(['pendaftaran', 'pencairanDana', 'absensiPertemuan', 'laporanBulanan'])
-                       ->findOrFail($id);
-        
+            ->findOrFail($id);
+
         // Pastikan penerima ini adalah tanggung jawab pendamping yang login
         $isPenerimaValid = $penerima->pendaftaran()
             ->where('pendamping_id', $pendampingProfile->id)

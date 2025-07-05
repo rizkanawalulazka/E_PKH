@@ -92,16 +92,34 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $p->no_hp }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex flex-wrap gap-1">
-                                @if(is_array($p->komponen))
-                                    @foreach($p->komponen as $komponen)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            @if($komponen == 'kesehatan') bg-red-100 text-red-800
-                                            @elseif($komponen == 'pendidikan') bg-blue-100 text-blue-800
-                                            @else bg-green-100 text-green-800
-                                            @endif">
-                                            {{ ucfirst(str_replace('_', ' ', $komponen)) }}
-                                        </span>
+                                @if($p->komponen)
+                                    @php
+                                        $komponenArray = explode(', ', $p->komponen);
+                                        $komponenLabels = [
+                                            'ibu_hamil' => ['label' => 'Ibu Hamil', 'color' => 'red', 'icon' => 'fa-female'],
+                                            'balita' => ['label' => 'Balita', 'color' => 'pink', 'icon' => 'fa-baby'],
+                                            'lansia' => ['label' => 'Lansia', 'color' => 'gray', 'icon' => 'fa-user-alt'],
+                                            'anak_sd' => ['label' => 'Anak SD', 'color' => 'blue', 'icon' => 'fa-child'],
+                                            'anak_smp' => ['label' => 'Anak SMP', 'color' => 'indigo', 'icon' => 'fa-user-graduate'],
+                                            'anak_sma' => ['label' => 'Anak SMA', 'color' => 'purple', 'icon' => 'fa-graduation-cap'],
+                                            'disabilitas_berat' => ['label' => 'Disabilitas Berat', 'color' => 'green', 'icon' => 'fa-wheelchair'],
+                                            'lanjut_usia' => ['label' => 'Lanjut Usia', 'color' => 'yellow', 'icon' => 'fa-user-clock'],
+                                        ];
+                                    @endphp
+                                    @foreach($komponenArray as $komponen)
+                                        @if(isset($komponenLabels[$komponen]))
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $komponenLabels[$komponen]['color'] }}-100 text-{{ $komponenLabels[$komponen]['color'] }}-800">
+                                                <i class="fas {{ $komponenLabels[$komponen]['icon'] }} mr-1"></i>
+                                                {{ $komponenLabels[$komponen]['label'] }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                {{ ucfirst(str_replace('_', ' ', $komponen)) }}
+                                            </span>
+                                        @endif
                                     @endforeach
+                                @else
+                                    <span class="text-gray-400 text-xs">-</span>
                                 @endif
                             </div>
                         </td>

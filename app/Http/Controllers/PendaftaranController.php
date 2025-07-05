@@ -39,7 +39,8 @@ class PendaftaranController extends Controller
             'alamat' => substr($request->alamat ?? '', 0, 50) . '...',
             'no_hp' => $request->no_hp,
             'komponen' => $request->komponen,
-            'has_file' => $request->hasFile('kartu_keluarga')
+            'has_kartu_keluarga' => $request->hasFile('kartu_keluarga'),
+            'has_foto_rumah' => $request->hasFile('foto_rumah') // Tambahkan ini
         ]);
 
         // Validasi data
@@ -53,10 +54,9 @@ class PendaftaranController extends Controller
                 'alamat' => 'required|string|min:10',
                 'no_hp' => 'required|string|min:10|max:15',
                 'komponen' => 'required|array|min:1',
-                'komponen.*' => 'in:kesehatan,pendidikan,kesejahteraan_sosial',
+                'komponen.*' => 'in:ibu_hamil,balita,lansia,anak_sd,anak_smp,anak_sma,disabilitas_berat,lanjut_usia',
                 'kartu_keluarga' => 'required|file|image|mimes:jpeg,png,jpg|max:2048',
-                'foto_rumah' => 'required|image|mimes:jpeg,jpg,png|max:2048',
-
+                'foto_rumah' => 'required|file|image|mimes:jpeg,png,jpg|max:2048', // Pastikan validation lengkap
             ], [
                 'nik.required' => 'NIK wajib diisi',
                 'nik.size' => 'NIK harus tepat 16 digit',
@@ -75,18 +75,21 @@ class PendaftaranController extends Controller
                 'komponen.required' => 'Pilih minimal satu komponen bantuan',
                 'komponen.min' => 'Pilih minimal satu komponen bantuan',
                 'kartu_keluarga.required' => 'Kartu keluarga wajib diunggah',
-                'kartu_keluarga.image' => 'File harus berupa gambar',
-                'kartu_keluarga.mimes' => 'Format file harus JPG, JPEG, atau PNG',
-                'kartu_keluarga.max' => 'Ukuran file maksimal 2MB',
+                'kartu_keluarga.file' => 'Kartu keluarga harus berupa file',
+                'kartu_keluarga.image' => 'Kartu keluarga harus berupa gambar',
+                'kartu_keluarga.mimes' => 'Format kartu keluarga harus JPG, JPEG, atau PNG',
+                'kartu_keluarga.max' => 'Ukuran kartu keluarga maksimal 2MB',
                 'foto_rumah.required' => 'Foto rumah wajib diunggah',
-                'foto_rumah.image' => 'File harus berupa gambar',
-                'foto_rumah.mimes' => 'Format gambar harus JPG, JPEG, atau PNG',
-                'foto_rumah.max' => 'Ukuran file maksimal 2MB',
+                'foto_rumah.file' => 'Foto rumah harus berupa file',
+                'foto_rumah.image' => 'Foto rumah harus berupa gambar',
+                'foto_rumah.mimes' => 'Format foto rumah harus JPG, JPEG, atau PNG',
+                'foto_rumah.max' => 'Ukuran foto rumah maksimal 2MB',
+                'komponen.*' => 'Pilihan komponen bantuan tidak valid',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Validation Error:', [
                 'errors' => $e->errors(),
-                'request_data' => $request->except(['kartu_keluarga'])
+                'request_data' => $request->except(['kartu_keluarga', 'foto_rumah'])
             ]);
 
             return response()->json([
@@ -106,28 +109,46 @@ class PendaftaranController extends Controller
                 ], 422);
             }
 
-            // Handle file upload
+            // PERBAIKAN: Handle file upload untuk kedua file
             $kartuKeluargaPath = null;
+            $fotoRumahPath = null;
+
+            // Upload Kartu Keluarga
             if ($request->hasFile('kartu_keluarga')) {
                 $file = $request->file('kartu_keluarga');
-                $fileName = time() . '_' . $file->getClientOriginalName();
+                $fileName = time() . '_kk_' . $file->getClientOriginalName();
                 $kartuKeluargaPath = $file->storeAs('kartu_keluarga', $fileName, 'public');
             }
 
-            // Simpan data ke database menggunakan fillable
+            // Upload Foto Rumah
+            if ($request->hasFile('foto_rumah')) {
+                $file = $request->file('foto_rumah');
+                $fileName = time() . '_rumah_' . $file->getClientOriginalName();
+                $fotoRumahPath = $file->storeAs('foto_rumah', $fileName, 'public');
+            }
+
+            // Simpan data ke database dengan semua field
             $pendaftaran = Pendaftaran::create([
                 'user_id' => auth()->id(),
                 'nik' => $validatedData['nik'],
-                'no_kk' => $request->no_kk,
+                'no_kk' => $validatedData['no_kk'], // Gunakan validated data
                 'nama' => $validatedData['nama'],
                 'tempat_lahir' => $validatedData['tempat_lahir'],
                 'tanggal_lahir' => $validatedData['tanggal_lahir'],
                 'alamat' => $validatedData['alamat'],
                 'no_hp' => $validatedData['no_hp'],
-                'komponen' => $validatedData['komponen'],
+                'komponen' => implode(', ', $validatedData['komponen']), // Convert array to JSON
                 'kartu_keluarga' => $kartuKeluargaPath,
-                 'foto_rumah' => $fotoRumahPath,
+                'foto_rumah' => $fotoRumahPath, // Sekarang sudah didefinisikan
                 'status' => 'pending'
+            ]);
+
+            \Log::info('Pendaftaran berhasil disimpan:', [
+                'id' => $pendaftaran->id,
+                'user_id' => $pendaftaran->user_id,
+                'nik' => $pendaftaran->nik,
+                'kartu_keluarga_path' => $kartuKeluargaPath,
+                'foto_rumah_path' => $fotoRumahPath
             ]);
 
             return response()->json([
@@ -135,27 +156,26 @@ class PendaftaranController extends Controller
                 'message' => 'Pendaftaran berhasil dikirim dan sedang diproses.',
                 'data' => [
                     'id' => $pendaftaran->id,
-                    'status' => $pendaftaran->status
+                    'status' => $pendaftaran->status,
+                    'files_uploaded' => [
+                        'kartu_keluarga' => $kartuKeluargaPath ? true : false,
+                        'foto_rumah' => $fotoRumahPath ? true : false
+                    ]
                 ]
             ]);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak valid',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
             // Log error untuk debugging
             \Log::error('Pendaftaran Error: ' . $e->getMessage(), [
                 'user_id' => auth()->id(),
-                'request_data' => $request->except(['kartu_keluarga']),
+                'request_data' => $request->except(['kartu_keluarga', 'foto_rumah']),
                 'trace' => $e->getTraceAsString()
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.'
+                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.',
+                'error' => $e->getMessage() // Hapus ini di production
             ], 500);
         }
     }
