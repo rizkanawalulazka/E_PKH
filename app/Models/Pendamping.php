@@ -12,7 +12,7 @@ class Pendamping extends Model
     protected $table = 'pendamping';
 
     protected $fillable = [
-        'user_id',
+        // 'user_id',
         'nama_lengkap',
         'nip',
         'no_hp',
@@ -24,7 +24,7 @@ class Pendamping extends Model
     // Relasi ke User
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'id');
     }
 
     // Relasi ke Pendaftaran (one-to-many)

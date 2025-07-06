@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -55,12 +54,12 @@
                 <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-800">Masuk sebagai</label>
                     <div class="relative">
-                        <select name="role" required 
+                        <select name="role" id="role" required 
                                 class="w-full px-4 py-3 bg-white/70 border border-white/50 rounded-xl text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 appearance-none cursor-pointer hover:bg-white/80">
                             <option value="">Pilih peran Anda</option>
-                            <option value="admin">Admin</option>
-                            <option value="pendamping">Pendamping</option>
-                            <option value="penerima">Penerima Bansos</option>
+                            <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="pendamping" {{ old('role') === 'pendamping' ? 'selected' : '' }}>Pendamping</option>
+                            <option value="penerima" {{ old('role') === 'penerima' ? 'selected' : '' }}>Penerima Bansos</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                             <i class="bi bi-chevron-down text-gray-600"></i>
@@ -68,33 +67,25 @@
                     </div>
                 </div>
 
-                <!-- NIK Input -->
+                <!-- Identifier Input -->
                 <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-gray-800">NIK</label>
-                    <div class="relative">
-                        <input type="text" name="nik" placeholder="Masukkan NIK Anda" required
-                               class="w-full px-4 py-3 pl-12 bg-white/70 border border-white/50 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white/80"
-                               value="{{ old('nik') }}">
-                        <div class="absolute inset-y-0 left-0 flex items-center px-4">
-                            <i class="bi bi-person-badge text-gray-600"></i>
-                        </div>
-                    </div>
+                    <label for="identifier" class="block text-sm font-medium text-gray-700 mb-2">
+                        <span id="identifier-label">NIK/NIP</span>
+                    </label>
+                    <input type="text" name="identifier" id="identifier" required
+                           value="{{ old('identifier') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Masukkan NIK/NIP">
                 </div>
 
                 <!-- Password Input -->
                 <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-gray-800">Kata Sandi</label>
-                    <div class="relative">
-                        <input type="password" name="password" placeholder="Masukkan kata sandi" required id="passwordInput"
-                               class="w-full px-4 py-3 pl-12 pr-12 bg-white/70 border border-white/50 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white/80">
-                        <div class="absolute inset-y-0 left-0 flex items-center px-4">
-                            <i class="bi bi-lock text-gray-600"></i>
-                        </div>
-                        <button type="button" onclick="togglePassword()" 
-                                class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 hover:text-gray-800 transition-colors duration-300">
-                            <i class="bi bi-eye-slash" id="toggleIcon"></i>
-                        </button>
-                    </div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                        Password
+                    </label>
+                    <input type="password" name="password" id="password" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Masukkan password">
                 </div>
 
                 <!-- Remember Me & Forgot Password -->
@@ -110,15 +101,11 @@
                     </a>
                 </div>
 
-                <!-- Submit Buttons -->
-                <div class="flex flex-col sm:flex-row gap-3">
+                <!-- Submit Button -->
+                <div>
                     <button type="submit" 
-                            class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        <i class="bi bi-box-arrow-in-right mr-2"></i>Masuk
-                    </button>
-                    <button type="button" onclick="window.location.href='/'" 
-                            class="flex-1 bg-white/80 text-gray-900 py-3 px-6 rounded-xl font-semibold text-lg border border-gray-300 hover:bg-white hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                        <i class="bi bi-x-circle mr-2"></i>Batal
+                            class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                        Masuk
                     </button>
                 </div>
             </form>
@@ -146,39 +133,20 @@
 
     <!-- JavaScript -->
     <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('passwordInput');
-            const toggleIcon = document.getElementById('toggleIcon');
+        document.getElementById('role').addEventListener('change', function() {
+            const label = document.getElementById('identifier-label');
+            const input = document.getElementById('identifier');
             
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.classList.remove('bi-eye-slash');
-                toggleIcon.classList.add('bi-eye');
+            if (this.value === 'penerima') {
+                label.textContent = 'NIK';
+                input.placeholder = 'Masukkan NIK (16 digit)';
+            } else if (this.value === 'admin' || this.value === 'pendamping') {
+                label.textContent = 'NIP';
+                input.placeholder = 'Masukkan NIP';
             } else {
-                passwordInput.type = 'password';
-                toggleIcon.classList.remove('bi-eye');
-                toggleIcon.classList.add('bi-eye-slash');
+                label.textContent = 'NIK/NIP';
+                input.placeholder = 'Masukkan NIK/NIP';
             }
-        }
-
-        // Add smooth animations on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const card = document.querySelector('.backdrop-blur-lg');
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                card.style.transition = 'all 0.6s ease-out';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, 100);
-        });
-
-        // Form validation feedback
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const submitBtn = document.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise animate-spin mr-2"></i>Masuk...';
-            submitBtn.disabled = true;
         });
     </script>
 </body>

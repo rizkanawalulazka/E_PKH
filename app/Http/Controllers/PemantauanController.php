@@ -29,31 +29,66 @@ class PemantauanController extends Controller
                     $query->where('status', 'approved')
                           ->whereNotNull('pendamping_id');
                 })
-                ->with(['pendaftaran' => function($query) {
-                    $query->where('status', 'approved')
-                          ->whereNotNull('pendamping_id')
-                          ->with('pendamping.user'); // Load pendamping info
-                }])
+                ->with([
+                    'pendaftaran' => function($query) {
+                        $query->where('status', 'approved')
+                              ->whereNotNull('pendamping_id')
+                              ->with('pendamping.user');
+                    },
+                    'pencairanDana',
+                    'absensiPertemuan'
+                ])
                 ->get();
         } else {
             // Pendamping melihat hanya penerima yang didampinginya
             $pendampingProfile = $user->pendamping;
+            
+            if (!$pendampingProfile) {
+                return redirect()->route('dashboard')->with('error', 'Profil pendamping tidak ditemukan.');
+            }
             
             $penerima = User::where('role', 'penerima')
                 ->whereHas('pendaftaran', function($query) use ($pendampingProfile) {
                     $query->where('pendamping_id', $pendampingProfile->id)
                           ->where('status', 'approved');
                 })
-                ->with(['pendaftaran' => function($query) use ($pendampingProfile) {
-                    $query->where('pendamping_id', $pendampingProfile->id)
-                          ->where('status', 'approved')
-                          ->with('pendamping.user');
-                }])
+                ->with([
+                    'pendaftaran' => function($query) use ($pendampingProfile) {
+                        $query->where('pendamping_id', $pendampingProfile->id)
+                              ->where('status', 'approved')
+                              ->with('pendamping.user');
+                    },
+                    'pencairanDana',
+                    'absensiPertemuan'
+                ])
                 ->get();
+        }
+
+        // Ambil tahun-tahun dari database untuk dropdown
+        $tahunPencairan = PencairanDana::distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
+        
+        $tahunAbsensi = AbsensiPertemuan::distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
+        
+        // Gabungkan dan ambil unique tahun
+        $availableYears = $tahunPencairan->merge($tahunAbsensi)
+            ->unique()
+            ->sort()
+            ->values();
+        
+        // Jika tidak ada data, gunakan tahun sekarang
+        if ($availableYears->isEmpty()) {
+            $availableYears = collect([Carbon::now()->year]);
         }
 
         return view('pendamping.pemantauanPKH', [
             'penerima' => $penerima,
+            'availableYears' => $availableYears,
+            'currentYear' => Carbon::now()->year,
+            'currentMonth' => Carbon::now()->month,
             'title' => 'Pemantauan PKH',
             'isAdmin' => $user->role === 'admin'
         ]);
@@ -351,6 +386,57 @@ class PemantauanController extends Controller
             'title' => 'Pemantauan PKH - ' . $pendamping->user->name,
             'pendamping' => $pendamping,
             'penerima' => $penerima
+        ]);
+    }
+
+    public function updateYear(Request $request)
+    {
+        $user = auth()->user();
+        $year = $request->get('year', Carbon::now()->year);
+        
+        if (!in_array($user->role, ['pendamping', 'admin'])) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak']);
+        }
+
+        if ($user->role === 'admin') {
+            $penerima = User::where('role', 'penerima')
+                ->whereHas('pendaftaran', function($query) {
+                    $query->where('status', 'approved')
+                          ->whereNotNull('pendamping_id');
+                })
+                ->with('pencairanDana')
+                ->get();
+        } else {
+            $pendampingProfile = $user->pendamping;
+            
+            if (!$pendampingProfile) {
+                return response()->json(['success' => false, 'message' => 'Profil pendamping tidak ditemukan']);
+            }
+            
+            $penerima = User::where('role', 'penerima')
+                ->whereHas('pendaftaran', function($query) use ($pendampingProfile) {
+                    $query->where('pendamping_id', $pendampingProfile->id)
+                          ->where('status', 'approved');
+                })
+                ->with('pencairanDana')
+                ->get();
+        }
+
+        $pencairanData = [];
+        foreach ($penerima as $person) {
+            $pencairanCount = $person->pencairanDana->where('tahun', $year)->where('status', 'dicairkan')->count();
+            $totalPencairan = $person->pencairanDana->where('tahun', $year)->count();
+            
+            $pencairanData[] = [
+                'person_id' => $person->id,
+                'pencairan_count' => $pencairanCount,
+                'total_pencairan' => $totalPencairan
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'pencairanData' => $pencairanData
         ]);
     }
 }

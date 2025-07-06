@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Pemantauan PKH')
@@ -13,8 +12,21 @@
             </div>
             <h1 class="text-2xl font-bold text-gray-900">Pemantauan PKH</h1>
         </div>
-        <div class="text-sm text-gray-600">
-            Total Penerima: {{ $penerima->count() }} orang
+        <div class="flex items-center space-x-4">
+            <!-- Filter Tahun -->
+            <div class="flex items-center space-x-2">
+                <label for="yearFilter" class="text-sm font-medium text-gray-700">Tahun:</label>
+                <select id="yearFilter" class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    @foreach($availableYears as $year)
+                        <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>
+                            {{ $year }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="text-sm text-gray-600">
+                Total Penerima: {{ $penerima->count() }} orang
+            </div>
         </div>
     </div>
 
@@ -29,36 +41,87 @@
                     </div>
                     <div>
                         <h3 class="font-semibold text-gray-900">{{ $person->name }}</h3>
-                        <p class="text-sm text-gray-600">{{ $person->email }}</p>
+                        <p class="text-sm text-gray-600">{{ $person->email ?? 'Email tidak tersedia' }}</p>
                     </div>
                 </div>
-                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                    Aktif
+                @php
+                    $statusPendaftaran = $person->pendaftaran->first()->status ?? 'unknown';
+                @endphp
+                <span class="px-2 py-1 {{ $statusPendaftaran == 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }} text-xs font-medium rounded-full">
+                    {{ $statusPendaftaran == 'approved' ? 'Aktif' : ucfirst($statusPendaftaran) }}
                 </span>
             </div>
 
             <div class="space-y-3">
+                <!-- Pencairan Dinamis -->
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Pencairan 2024:</span>
-                    <span class="text-sm font-medium">
-                        {{ $person->pencairanDana->where('tahun', 2024)->where('status', 'dicairkan')->count() }}/4
+                    <span class="text-sm text-gray-600">Pencairan <span class="year-display">{{ $currentYear }}</span>:</span>
+                    @php
+                        $pencairanCount = $person->pencairanDana->where('tahun', $currentYear)->where('status', 'dicairkan')->count();
+                        $totalPencairan = $person->pencairanDana->where('tahun', $currentYear)->count();
+                    @endphp
+                    <span class="text-sm font-medium pencairan-count" data-person-id="{{ $person->id }}">
+                        {{ $pencairanCount }}/{{ $totalPencairan > 0 ? $totalPencairan : 4 }}
                     </span>
                 </div>
+
+                <!-- Kehadiran Bulan Ini -->
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Kehadiran Bulan Ini:</span>
+                    <span class="text-sm text-gray-600">Kehadiran {{ \Carbon\Carbon::now()->format('F Y') }}:</span>
                     @php
-                        $absenBulanIni = $person->absensiPertemuan->where('bulan', date('n'))->where('tahun', date('Y'))->first();
+                        $absenBulanIni = $person->absensiPertemuan
+                            ->where('bulan', $currentMonth)
+                            ->where('tahun', $currentYear)
+                            ->first();
                     @endphp
                     <span class="text-sm font-medium">
                         @if($absenBulanIni)
                             @if($absenBulanIni->status == 'hadir')
                                 <span class="text-green-600">✓ Hadir</span>
+                            @elseif($absenBulanIni->status == 'tidak_hadir')
+                                <span class="text-red-600">✗ Tidak Hadir</span>
+                            @elseif($absenBulanIni->status == 'sakit')
+                                <span class="text-yellow-600">⚕ Sakit</span>
+                            @elseif($absenBulanIni->status == 'izin')
+                                <span class="text-blue-600">📋 Izin</span>
                             @else
-                                <span class="text-red-600">✗ {{ ucfirst($absenBulanIni->status) }}</span>
+                                <span class="text-gray-600">{{ ucfirst($absenBulanIni->status) }}</span>
                             @endif
                         @else
                             <span class="text-gray-500">Belum dicatat</span>
                         @endif
+                    </span>
+                </div>
+
+                <!-- Status Terakhir -->
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Status Terakhir:</span>
+                    @php
+                        $laporanTerakhir = $person->laporanBulanan
+                            ->where('tahun', $currentYear)
+                            ->sortByDesc('bulan')
+                            ->first();
+                    @endphp
+                    <span class="text-sm font-medium">
+                        @if($laporanTerakhir)
+                            <span class="text-green-600">{{ \Carbon\Carbon::create($laporanTerakhir->tahun, $laporanTerakhir->bulan)->format('M Y') }}</span>
+                        @else
+                            <span class="text-gray-500">Belum ada laporan</span>
+                        @endif
+                    </span>
+                </div>
+
+                <!-- Total Pencairan -->
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Total Pencairan:</span>
+                    @php
+                        $totalDana = $person->pencairanDana
+                            ->where('tahun', $currentYear)
+                            ->where('status', 'dicairkan')
+                            ->sum('jumlah');
+                    @endphp
+                    <span class="text-sm font-medium text-green-600">
+                        Rp {{ number_format($totalDana, 0, ',', '.') }}
                     </span>
                 </div>
             </div>
@@ -84,4 +147,47 @@
     </div>
     @endif
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const yearFilter = document.getElementById('yearFilter');
+    
+    yearFilter.addEventListener('change', function() {
+        const selectedYear = this.value;
+        
+        // Update tampilan tahun
+        document.querySelectorAll('.year-display').forEach(function(element) {
+            element.textContent = selectedYear;
+        });
+        
+        // Update data pencairan via AJAX
+        updatePencairanData(selectedYear);
+    });
+    
+    function updatePencairanData(year) {
+        fetch(`{{ route('pemantauan.update-year') }}?year=${year}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update data pencairan untuk setiap penerima
+                data.pencairanData.forEach(function(item) {
+                    const countElement = document.querySelector(`[data-person-id="${item.person_id}"]`);
+                    if (countElement) {
+                        countElement.textContent = `${item.pencairan_count}/${item.total_pencairan > 0 ? item.total_pencairan : 4}`;
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+});
+</script>
 @endsection

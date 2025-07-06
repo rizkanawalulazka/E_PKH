@@ -22,6 +22,7 @@ class User extends Authenticatable
         'password',
         'role',
         'nik',
+        'nip',
     ];
 
     /**
@@ -64,7 +65,7 @@ class User extends Authenticatable
      */
     public function pencairanDana()
     {
-        return $this->hasMany(PencairanDana::class);
+            return $this->hasMany(PencairanDana::class, 'user_id');
     }
 
     /**
@@ -72,7 +73,7 @@ class User extends Authenticatable
      */
     public function absensiPertemuan()
     {
-        return $this->hasMany(AbsensiPertemuan::class);
+        return $this->hasMany(AbsensiPertemuan::class, 'user_id');
     }
 
     /**
@@ -80,7 +81,7 @@ class User extends Authenticatable
      */
     public function laporanBulanan()
     {
-        return $this->hasMany(LaporanBulanan::class);
+        return $this->hasMany(LaporanBulanan::class, 'user_id');
     }
 
     /**

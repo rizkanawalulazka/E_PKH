@@ -20,6 +20,9 @@ class PendampingController extends Controller
         if ($user->role === 'pendamping') {
             $pendampingProfile = $user->pendamping;
 
+             if (!$pendampingProfile) {
+            return redirect()->route('dashboard')->with('error', 'Profil pendamping tidak ditemukan');
+        }
             // Ambil penerima yang didampingi oleh pendamping ini
             $penerima = User::where('role', 'penerima')
                 ->whereHas('pendaftaran', function ($query) use ($pendampingProfile) {
@@ -77,7 +80,7 @@ class PendampingController extends Controller
             'menuPenerima' => 'active'
         ]);
     }
-    public function daftarPenerima()
+    public function daftarPendamping()
     {
         $user = Auth::user();
 
@@ -309,16 +312,13 @@ class PendampingController extends Controller
     {
         // Check role admin
         if (!auth()->check() || auth()->user()->role !== 'admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized - Hanya admin yang dapat menambah pendamping'
-            ], 403);
+            return redirect()->route('pendamping.daftar-pendamping')->with('error', 'Unauthorized - Hanya admin yang dapat menambah pendamping');
         }
 
         try {
             $validated = $request->validate([
-                'nik' => 'required|digits:16|unique:users,nik',
-                'name' => 'required|string|max:255',
+                'nip' => 'required|string|unique:users,nip|unique:pendamping,nip',
+                'nama_lengkap' => 'required|string|max:255',
                 'password' => 'required|min:6',
                 'no_hp' => 'required|digits_between:10,15',
                 'alamat' => 'required|string',
@@ -327,8 +327,9 @@ class PendampingController extends Controller
 
             // Buat user pendamping
             $user = User::create([
-                'nik' => $validated['nik'],
-                'name' => $validated['name'],
+                'nik' => null,
+                'nip' => $validated['nip'],
+                'name' => $validated['nama_lengkap'],
                 'password' => Hash::make($validated['password']),
                 'role' => 'pendamping'
             ]);
@@ -336,35 +337,23 @@ class PendampingController extends Controller
             // Buat data pendamping
             $pendamping = Pendamping::create([
                 'user_id' => $user->id,
+                'nama_lengkap' => $validated['nama_lengkap'],
+                'nip' => $validated['nip'],
                 'no_hp' => $validated['no_hp'],
                 'alamat' => $validated['alamat'],
                 'wilayah_kerja' => $validated['wilayah_kerja'],
-                'status' => 'active'
+                'status' => 'aktif'
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Pendamping berhasil ditambahkan!'
-            ]);
+            // Redirect dengan success message
+            return redirect()->route('pendamping.penerima')->with('success', 'Pendamping berhasil ditambahkan!');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak valid',
-                'errors' => $e->errors()
-            ], 422);
-
+            // Redirect dengan error message
+            return redirect()->route('pendamping.penerima')->with('error', 'Validasi gagal: ' . implode(', ', $e->validator->errors()->all()));
         } catch (\Exception $e) {
-            \Log::error('Error creating pendamping:', [
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan sistem'
-            ], 500);
+            // Redirect dengan error message tanpa detail
+            return redirect()->route('pendamping.penerima')->with('error', 'Terjadi kesalahan sistem');
         }
     }
 

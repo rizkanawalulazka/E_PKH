@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -29,7 +28,8 @@
                     <i class="bi bi-person-plus text-white text-2xl"></i>
                 </div>
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">E-PKH</h1>
-                <p class="text-gray-700 font-medium">Buat akun baru</p>
+                <p class="text-gray-700 font-medium">Daftar sebagai Penerima PKH</p>
+                <p class="text-sm text-gray-600 mt-1">Buat akun untuk mengajukan bantuan sosial</p>
             </div>
 
             <!-- Success Message -->
@@ -60,21 +60,14 @@
             <!-- Register Form -->
             <form action="{{ url('/register') }}" method="post" class="space-y-5">
                 @csrf
-                
-                <!-- Role Selection -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-gray-800">Daftar sebagai</label>
-                    <div class="relative">
-                        <select name="role" required 
-                                class="w-full px-4 py-3 bg-white/70 border border-white/50 rounded-xl text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 appearance-none cursor-pointer hover:bg-white/80">
-                            <option value="">Pilih peran Anda</option>
-                            <option value="admin">Admin</option>
-                            <option value="pendamping">Pendamping</option>
-                            <option value="penerima">Penerima Bansos</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                            <i class="bi bi-chevron-down text-gray-600"></i>
-                        </div>
+
+                <!-- Info Banner -->
+                <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-4 mb-6">
+                    <div class="flex items-center">
+                        <i class="bi bi-info-circle text-blue-600 mr-2"></i>
+                        <span class="text-blue-800 text-sm font-medium">
+                            Akun akan didaftarkan sebagai Penerima PKH
+                        </span>
                     </div>
                 </div>
 
@@ -82,7 +75,7 @@
                 <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-800">Nama Lengkap</label>
                     <div class="relative">
-                        <input type="text" name="nama_lengkap" placeholder="Masukkan nama lengkap" required
+                        <input type="text" name="nama_lengkap" placeholder="Masukkan nama lengkap sesuai KTP" required
                                class="w-full px-4 py-3 pl-12 bg-white/70 border border-white/50 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white/80"
                                value="{{ old('nama_lengkap') }}">
                         <div class="absolute inset-y-0 left-0 flex items-center px-4">
@@ -93,7 +86,7 @@
 
                 <!-- NIK Input -->
                 <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-gray-800">NIK</label>
+                    <label class="block text-sm font-semibold text-gray-800">NIK (Nomor Induk Kependudukan)</label>
                     <div class="relative">
                         <input type="text" name="nik" placeholder="Masukkan NIK (16 digit)" required
                                class="w-full px-4 py-3 pl-12 bg-white/70 border border-white/50 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white/80"
@@ -102,7 +95,10 @@
                             <i class="bi bi-person-badge text-gray-600"></i>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-600 mt-1">NIK harus 16 digit angka</p>
+                    <p class="text-xs text-gray-600 mt-1">
+                        <i class="bi bi-exclamation-circle mr-1"></i>
+                        NIK harus 16 digit angka sesuai KTP
+                    </p>
                 </div>
 
                 <!-- Password Input -->
@@ -149,6 +145,7 @@
                         <a href="#" class="text-blue-700 hover:text-blue-800 font-medium hover:underline">Syarat dan Ketentuan</a> 
                         serta 
                         <a href="#" class="text-blue-700 hover:text-blue-800 font-medium hover:underline">Kebijakan Privasi</a>
+                        Program Keluarga Harapan (PKH)
                     </label>
                 </div>
 
@@ -156,7 +153,7 @@
                 <div class="flex flex-col sm:flex-row gap-3 pt-2">
                     <button type="submit" 
                             class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        <i class="bi bi-person-plus mr-2"></i>Daftar
+                        <i class="bi bi-person-plus mr-2"></i>Daftar Sekarang
                     </button>
                     <button type="button" onclick="window.location.href='/'" 
                             class="flex-1 bg-white/80 text-gray-900 py-3 px-6 rounded-xl font-semibold text-lg border border-gray-300 hover:bg-white hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
@@ -173,6 +170,14 @@
                        class="text-blue-700 hover:text-blue-800 font-semibold transition-colors duration-300 hover:underline">
                         Masuk sekarang
                     </a>
+                </p>
+            </div>
+
+            <!-- Info Footer -->
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-600">
+                    <i class="bi bi-shield-check mr-1"></i>
+                    Data Anda akan digunakan untuk verifikasi kelayakan penerima PKH
                 </p>
             </div>
 
@@ -250,12 +255,12 @@
             }
             
             const submitBtn = document.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise animate-spin mr-2"></i>Mendaftar...';
+            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise animate-spin mr-2"></i>Mendaftarkan...';
             submitBtn.disabled = true;
         });
 
         // Real-time form validation
-        document.querySelectorAll('input[required], select[required]').forEach(input => {
+        document.querySelectorAll('input[required]').forEach(input => {
             input.addEventListener('blur', function() {
                 if (this.value.trim() === '') {
                     this.classList.add('border-red-500');

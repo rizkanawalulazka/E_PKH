@@ -55,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Pendamping routes
     Route::get('/pendamping', [PendampingController::class, 'index'])->name('pendamping.index');
-    Route::get('/pendamping/daftar-penerima', [PendampingController::class, 'daftarPenerima'])->name('pendamping.penerima');
+    Route::get('/pendamping/daftar-pendamping', [PendampingController::class, 'daftarPendamping'])->name('pendamping.penerima');
 
     // Route untuk pemantauan PKH
     Route::get('/pendamping/pemantauan', [PemantauanController::class, 'index'])->name('pendamping.pemantauan');
@@ -85,4 +85,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pemantauan/{id}/pencairan', [PemantauanController::class, 'updatePencairan'])->name('pemantauan.update-pencairan');
     Route::post('/pemantauan/{id}/absensi', [PemantauanController::class, 'updateAbsensi'])->name('pemantauan.update-absensi');
     Route::post('/pemantauan/{id}/laporan', [PemantauanController::class, 'updateLaporan'])->name('pemantauan.update-laporan');
+
+    Route::get('/pemantauan/update-year', [PemantauanController::class, 'updateYear'])->name('pemantauan.update-year');
 });

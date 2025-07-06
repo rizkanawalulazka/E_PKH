@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $user = auth()->user();
         
         // Data untuk semua role
-        $totalPenerima = User::where('role', 'penerima')
+        $totalPenerima = User::where('role',  'penerima')
             ->whereHas('pendaftaran', function($query) {
                 $query->where('status', 'approved');
             })
