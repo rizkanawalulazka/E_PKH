@@ -44,47 +44,38 @@ class DashboardController extends Controller
             $bantuanPerBulan[] = $totalBulan / 1000000; // Convert to million
         }
         
-        // PERBAIKAN: Data komponen PKH untuk pie chart
-        $komponenData = collect();
-        
-        $pendaftaranApproved = Pendaftaran::where('status', 'approved')->get();
-        
-        foreach ($pendaftaranApproved as $pendaftaran) {
-            // Cek apakah komponen sudah array atau masih string
-            if (is_string($pendaftaran->komponen)) {
-                $komponenArray = json_decode($pendaftaran->komponen, true) ?? [];
-            } else {
-                $komponenArray = $pendaftaran->komponen ?? [];
-            }
-            
-            // Tambahkan ke collection
-            foreach ($komponenArray as $komponen) {
-                $komponenData->push($komponen);
-            }
-        }
-        
-        // Kategorikan komponen
-        $komponenGrouped = $komponenData->groupBy(function($item) {
-            $kesehatan = ['ibu_hamil', 'balita'];
-            $pendidikan = ['anak_sd', 'anak_smp', 'anak_sma'];
-            $kesejahteraan = ['lansia', 'lanjut_usia', 'disabilitas_berat'];
-            
-            if (in_array($item, $kesehatan)) return 'Kesehatan';
-            if (in_array($item, $pendidikan)) return 'Pendidikan';
-            if (in_array($item, $kesejahteraan)) return 'Kesejahteraan Sosial';
-            return 'Lainnya';
-        })->map(function($group) {
-            return $group->count();
-        });
-        
-        // Pastikan semua kategori ada
+        // PERBAIKAN: Data komponen berdasarkan form pendaftaran
         $komponenData = [
-            'Kesehatan' => $komponenGrouped->get('Kesehatan', 0),
-            'Pendidikan' => $komponenGrouped->get('Pendidikan', 0),
-            'Kesejahteraan Sosial' => $komponenGrouped->get('Kesejahteraan Sosial', 0),
-            'Lainnya' => $komponenGrouped->get('Lainnya', 0)
+            // Kesehatan
+            'Ibu Hamil' => \App\Models\Pendaftaran::where('status', 'approved')
+                ->where('komponen', 'like', '%ibu_hamil%')->count(),
+            'Balita (0-5 tahun)' => \App\Models\Pendaftaran::where('status', 'approved')
+                ->where('komponen', 'like', '%balita%')->count(),
+            'Lansia (60+ tahun)' => \App\Models\Pendaftaran::where('status', 'approved')
+                ->where('komponen', 'like', '%lansia%')->count(),
+            
+            // Pendidikan
+            'Anak SD/MI' => \App\Models\Pendaftaran::where('status', 'approved')
+                ->where('komponen', 'like', '%anak_sd%')->count(),
+            'Anak SMP/MTs' => \App\Models\Pendaftaran::where('status', 'approved')
+                ->where('komponen', 'like', '%anak_smp%')->count(),
+            'Anak SMA/MA' => \App\Models\Pendaftaran::where('status', 'approved')
+                ->where('komponen', 'like', '%anak_sma%')->count(),
+            
+            // Kesejahteraan Sosial
+            'Disabilitas Berat' => \App\Models\Pendaftaran::where('status', 'approved')
+                ->where('komponen', 'like', '%disabilitas_berat%')->count(),
+            'Lanjut Usia (70+ tahun)' => \App\Models\Pendaftaran::where('status', 'approved')
+                ->where('komponen', 'like', '%lanjut_usia%')->count(),
         ];
-        
+
+        // Kelompokkan berdasarkan kategori
+        $komponenKategori = [
+            'Kesehatan' => $komponenData['Ibu Hamil'] + $komponenData['Balita (0-5 tahun)'] + $komponenData['Lansia (60+ tahun)'],
+            'Pendidikan' => $komponenData['Anak SD/MI'] + $komponenData['Anak SMP/MTs'] + $komponenData['Anak SMA/MA'],
+            'Kesejahteraan Sosial' => $komponenData['Disabilitas Berat'] + $komponenData['Lanjut Usia (70+ tahun)']
+        ];
+
         // Data tambahan berdasarkan role
         $additionalData = [];
         
@@ -118,6 +109,7 @@ class DashboardController extends Controller
             'rataBantuanBulanan',
             'bantuanPerBulan',
             'komponenData',
+            'komponenKategori',
             'additionalData'
         ));
     }

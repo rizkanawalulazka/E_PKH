@@ -226,39 +226,131 @@
             </div>
         </div>
 
-        <!-- Charts -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Bar Chart -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Data Bantuan Bulanan ({{ date('Y') }})</h2>
+        
+        <!-- Tabel Detail Komponen -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center mb-6">
+                <div class="p-2 bg-purple-100 rounded-lg mr-3">
+                    <i class="fas fa-list text-purple-600 text-xl"></i>
                 </div>
-                <div class="h-80">
-                    <canvas id="bantuanBarChart"></canvas>
+                <h2 class="text-lg font-semibold text-gray-900">Rincian Komponen PKH</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Kesehatan -->
+                <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                    <h3 class="font-semibold text-red-800 mb-4 flex items-center">
+                        <i class="fas fa-heartbeat mr-2"></i>
+                        Kesehatan
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Ibu Hamil</span>
+                            <span class="font-semibold text-red-600">{{ $komponenData['Ibu Hamil'] ?? 0 }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Balita (0-5 tahun)</span>
+                            <span class="font-semibold text-red-600">{{ $komponenData['Balita (0-5 tahun)'] ?? 0 }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Lansia (60+ tahun)</span>
+                            <span class="font-semibold text-red-600">{{ $komponenData['Lansia (60+ tahun)'] ?? 0 }}</span>
+                        </div>
+                        <div class="border-t border-red-300 pt-2">
+                            <div class="flex justify-between items-center font-semibold">
+                                <span class="text-red-800">Total</span>
+                                <span class="text-red-800">{{ $komponenKategori['Kesehatan'] ?? 0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pendidikan -->
+                <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <h3 class="font-semibold text-blue-800 mb-4 flex items-center">
+                        <i class="fas fa-graduation-cap mr-2"></i>
+                        Pendidikan
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Anak SD/MI</span>
+                            <span class="font-semibold text-blue-600">{{ $komponenData['Anak SD/MI'] ?? 0 }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Anak SMP/MTs</span>
+                            <span class="font-semibold text-blue-600">{{ $komponenData['Anak SMP/MTs'] ?? 0 }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Anak SMA/MA</span>
+                            <span class="font-semibold text-blue-600">{{ $komponenData['Anak SMA/MA'] ?? 0 }}</span>
+                        </div>
+                        <div class="border-t border-blue-300 pt-2">
+                            <div class="flex justify-between items-center font-semibold">
+                                <span class="text-blue-800">Total</span>
+                                <span class="text-blue-800">{{ $komponenKategori['Pendidikan'] ?? 0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kesejahteraan Sosial -->
+                <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                    <h3 class="font-semibold text-green-800 mb-4 flex items-center">
+                        <i class="fas fa-hands-helping mr-2"></i>
+                        Kesejahteraan Sosial
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Disabilitas Berat</span>
+                            <span class="font-semibold text-green-600">{{ $komponenData['Disabilitas Berat'] ?? 0 }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Lanjut Usia (70+ tahun)</span>
+                            <span class="font-semibold text-green-600">{{ $komponenData['Lanjut Usia (70+ tahun)'] ?? 0 }}</span>
+                        </div>
+                        <div class="border-t border-green-300 pt-2 mt-3">
+                            <div class="flex justify-between items-center font-semibold">
+                                <span class="text-green-800">Total</span>
+                                <span class="text-green-800">{{ $komponenKategori['Kesejahteraan Sosial'] ?? 0 }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <!-- Pie Chart -->
+        </div>
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Pie Chart - Kategori Komponen -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Distribusi Komponen PKH</h2>
+                    <h2 class="text-lg font-semibold text-gray-900">Distribusi Kategori PKH</h2>
                 </div>
                 <div class="h-80">
                     <canvas id="pkhPieChart"></canvas>
                 </div>
                 <div class="flex items-center justify-center space-x-6 mt-4">
                     <div class="flex items-center">
+                        <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                        <span class="text-sm text-gray-600">Kesehatan ({{ $komponenKategori['Kesehatan'] ?? 0 }})</span>
+                    </div>
+                    <div class="flex items-center">
                         <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                        <span class="text-sm text-gray-600">Kesehatan ({{ $komponenData['Kesehatan'] ?? 0 }})</span>
+                        <span class="text-sm text-gray-600">Pendidikan ({{ $komponenKategori['Pendidikan'] ?? 0 }})</span>
                     </div>
                     <div class="flex items-center">
                         <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                        <span class="text-sm text-gray-600">Pendidikan ({{ $komponenData['Pendidikan'] ?? 0 }})</span>
+                        <span class="text-sm text-gray-600">Kesejahteraan Sosial ({{ $komponenKategori['Kesejahteraan Sosial'] ?? 0 }})</span>
                     </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-cyan-500 rounded-full mr-2"></div>
-                        <span class="text-sm text-gray-600">Kesejahteraan Sosial ({{ $komponenData['Kesejahteraan Sosial'] ?? 0 }})</span>
-                    </div>
+                </div>
+            </div>
+
+            <!-- Bar Chart - Detail Komponen -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-semibold text-gray-900">Detail Komponen PKH</h2>
+                </div>
+                <div class="h-80">
+                    <canvas id="komponenBarChart"></canvas>
                 </div>
             </div>
         </div>
@@ -269,9 +361,10 @@
     <script>
         // Data dari backend
         const bantuanPerBulan = @json($bantuanPerBulan);
+        const komponenKategori = @json($komponenKategori);
         const komponenData = @json($komponenData);
 
-        // Pie Chart
+        // Pie Chart - Kategori Komponen
         var ctx = document.getElementById("pkhPieChart");
         var pkhPieChart = new Chart(ctx, {
             type: 'doughnut',
@@ -279,12 +372,12 @@
                 labels: ["Kesehatan", "Pendidikan", "Kesejahteraan Sosial"],
                 datasets: [{
                     data: [
-                        komponenData['Kesehatan'] || 0,
-                        komponenData['Pendidikan'] || 0,
-                        komponenData['Kesejahteraan Sosial'] || 0
+                        komponenKategori['Kesehatan'] || 0,
+                        komponenKategori['Pendidikan'] || 0,
+                        komponenKategori['Kesejahteraan Sosial'] || 0
                     ],
-                    backgroundColor: ['#3B82F6', '#10B981', '#06B6D4'],
-                    hoverBackgroundColor: ['#2563EB', '#059669', '#0891B2'],
+                    backgroundColor: ['#EF4444', '#3B82F6', '#10B981'],
+                    hoverBackgroundColor: ['#DC2626', '#2563EB', '#059669'],
                     borderWidth: 0,
                 }],
             },
@@ -300,7 +393,7 @@
                             label: function (context) {
                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                 const percentage = total > 0 ? Math.round((context.parsed / total) * 100) : 0;
-                                return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                return context.label + ': ' + context.parsed + ' penerima (' + percentage + '%)';
                             }
                         }
                     }
@@ -309,17 +402,43 @@
             },
         });
 
-        // Bar Chart
-        var ctx2 = document.getElementById("bantuanBarChart");
-        var bantuanBarChart = new Chart(ctx2, {
+        // Bar Chart - Detail Komponen
+        var ctx2 = document.getElementById("komponenBarChart");
+        var komponenBarChart = new Chart(ctx2, {
             type: 'bar',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                labels: [
+                    'Ibu Hamil', 
+                    'Balita', 
+                    'Lansia', 
+                    'SD/MI', 
+                    'SMP/MTs', 
+                    'SMA/MA', 
+                    'Disabilitas', 
+                    'Lanjut Usia'
+                ],
                 datasets: [{
-                    label: 'Bantuan (Juta Rupiah)',
-                    data: bantuanPerBulan,
-                    backgroundColor: '#3B82F6',
-                    borderColor: '#2563EB',
+                    label: 'Jumlah Penerima',
+                    data: [
+                        komponenData['Ibu Hamil'] || 0,
+                        komponenData['Balita (0-5 tahun)'] || 0,
+                        komponenData['Lansia (60+ tahun)'] || 0,
+                        komponenData['Anak SD/MI'] || 0,
+                        komponenData['Anak SMP/MTs'] || 0,
+                        komponenData['Anak SMA/MA'] || 0,
+                        komponenData['Disabilitas Berat'] || 0,
+                        komponenData['Lanjut Usia (70+ tahun)'] || 0
+                    ],
+                    backgroundColor: [
+                        '#EF4444', '#EF4444', '#EF4444', // Kesehatan (Merah)
+                        '#3B82F6', '#3B82F6', '#3B82F6', // Pendidikan (Biru)
+                        '#10B981', '#10B981'              // Kesejahteraan Sosial (Hijau)
+                    ],
+                    borderColor: [
+                        '#DC2626', '#DC2626', '#DC2626',
+                        '#2563EB', '#2563EB', '#2563EB',
+                        '#059669', '#059669'
+                    ],
                     borderWidth: 1,
                     borderRadius: 4,
                 }]
@@ -334,7 +453,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return 'Bantuan: Rp ' + (context.parsed.y * 1000000).toLocaleString('id-ID');
+                                return 'Penerima: ' + context.parsed.y + ' orang';
                             }
                         }
                     }
@@ -346,14 +465,19 @@
                             color: '#F3F4F6'
                         },
                         ticks: {
+                            stepSize: 1,
                             callback: function(value) {
-                                return value + 'M';
+                                return value + ' org';
                             }
                         }
                     },
                     x: {
                         grid: {
                             display: false
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
                         }
                     }
                 }

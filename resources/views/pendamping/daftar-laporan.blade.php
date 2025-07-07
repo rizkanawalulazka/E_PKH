@@ -12,7 +12,6 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Daftar Penerima PKH</h1>
-                    <p class="text-sm text-gray-600">{{ $pendamping->user->name }} - {{ $pendamping->wilayah_kerja }}</p>
                 </div>
             </div>
         </div>

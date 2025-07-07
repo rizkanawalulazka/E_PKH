@@ -16,7 +16,7 @@ class PendaftaranController extends Controller
         // Ambil data berdasarkan role user
         if (auth()->user()->role === 'admin') {
             // Admin bisa lihat semua data
-            $pendaftaran = Pendaftaran::with('user')->latest()->get();
+            $pendaftaran = Pendaftaran::with(['user','pendamping.user'])->latest()->get();
         } else {
             // User biasa hanya bisa lihat data sendiri berdasarkan user_id
             $pendaftaran = Pendaftaran::where('user_id', auth()->id())->latest()->get();
@@ -370,7 +370,7 @@ class PendaftaranController extends Controller
                 'success' => true,
                 'message' => 'Pendamping berhasil ditugaskan',
                 'data' => [
-                    'pendamping_name' => $pendamping->user->name,
+                    'pendamping_name' => $pendamping->nama_lengkap,
                     'pendamping_id' => $pendamping->id,
                     'pendamping_wilayah' => $pendamping->wilayah_kerja
                 ]
@@ -512,7 +512,7 @@ class PendaftaranController extends Controller
                     $pendaftaran->pendamping_id = $pendamping->id;
                     Log::info('Pendamping assigned', [
                         'pendamping_id' => $pendamping->id,
-                        'pendamping_name' => $pendamping->user->name ?? 'Unknown'
+                        'pendamping_name' => $pendamping->nama_lengkap ?? 'Unknown'
                     ]);
                 } else {
                     Log::warning('No pendamping available for assignment');
@@ -553,7 +553,7 @@ class PendaftaranController extends Controller
                     'status' => $pendaftaran->status,
                     'approved_at' => $pendaftaran->approved_at,
                     'pendamping_id' => $pendaftaran->pendamping_id,
-                    'pendamping_name' => $pendaftaran->pendamping ? $pendaftaran->pendamping->user->name : null,
+                    'pendamping_name' => $pendaftaran->pendamping ? $pendaftaran->pendamping->nama_lengkap : null,
                     'pendamping_wilayah' => $pendaftaran->pendamping ? $pendaftaran->pendamping->wilayah_kerja : null
                 ]
             ]);
@@ -606,7 +606,7 @@ class PendaftaranController extends Controller
                     'approved_at' => $pendaftaran->approved_at,
                     'pendamping' => $pendaftaran->pendamping ? [
                         'id' => $pendaftaran->pendamping->id,
-                        'name' => $pendaftaran->pendamping->user->name,
+                        'name' => $pendaftaran->pendamping->nama_lengkap,
                         'wilayah_kerja' => $pendaftaran->pendamping->wilayah_kerja
                     ] : null
                 ]

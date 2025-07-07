@@ -41,7 +41,6 @@
                     </div>
                     <div>
                         <h3 class="font-semibold text-gray-900">{{ $person->name }}</h3>
-                        <p class="text-sm text-gray-600">{{ $person->email ?? 'Email tidak tersedia' }}</p>
                     </div>
                 </div>
                 @php

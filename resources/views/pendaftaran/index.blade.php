@@ -408,8 +408,20 @@
                                                     </div>
                                                 </div>
                                                 <div class="ml-3">
-                                                    <div class="text-sm font-medium text-gray-900">{{ $pendamping->user->name }}</div>
+                                                    <div class="text-sm font-medium text-gray-900">{{ $pendamping->nama_lengkap }}</div>
                                                     <div class="text-sm text-gray-500">{{ $pendamping->wilayah_kerja }}</div>
+                                                </div>
+                                            </div>
+                                        @elseif($pendamping)
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-8 w-8">
+                                                    <div class="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
+                                                        <i class="fas fa-exclamation-triangle text-red-600 text-sm"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <div class="text-sm font-medium text-red-900">{{ $pendamping->nama_lengkap }}</div>
+                                                    <div class="text-sm text-red-500">User tidak ditemukan</div>
                                                 </div>
                                             </div>
                                         @else

@@ -31,7 +31,7 @@
                                 <div class="flex items-center">
                                     <i class="fas fa-user text-green-600 w-5 mr-3"></i>
                                     <span class="text-sm text-green-800">
-                                        <strong>Nama:</strong> {{ $pendamping->user->name ?? $pendamping->nama_lengkap }}
+                                        <strong>Nama:</strong> {{$pendamping->nama_lengkap }}
                                     </span>
                                 </div>
                                 <div class="flex items-center">
